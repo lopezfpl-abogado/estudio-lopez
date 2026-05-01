@@ -84,9 +84,15 @@ Te acompaño en el inicio de la jubilación ordinaria, por edad avanzada o por i
 
 Todo el trámite se gestiona de forma online a través del Portal del Cliente: tomás tu turno por videollamada, firmás digitalmente y seguís el avance del expediente sin moverte de tu casa.`;
 
+const TEXTO_SUCESIONES = `Una sucesión es uno de los trámites más sensibles que enfrenta una familia: combina el dolor de una pérdida con la urgencia de poner orden en patrimonios, papeles y plazos. Mi trabajo es despejar ese laberinto, explicarte en cada etapa qué corresponde hacer, y avanzar con celeridad para que la herencia se transmita sin demoras innecesarias.
+
+Atiendo sucesiones testamentarias e intestadas, con o sin testamento; declaratoria de herederos y posesión hereditaria; partición y adjudicación de bienes, tanto extrajudicial por convenio entre herederos como judicial cuando hay desacuerdo; inscripción de inmuebles, automotores y cuentas bancarias en cabeza de los herederos; cesión de derechos hereditarios; aceptación con beneficio de inventario; reclamos por colación, exclusión hereditaria o nulidad de testamento; y planificación sucesoria preventiva, para quienes quieren ordenar la transmisión de su patrimonio en vida.
+
+Trabajo con honorarios pactados desde la primera consulta y, en sucesiones donde el activo se realiza con la inscripción de bienes, ofrezco esquemas de pago diferido al cierre del trámite para que la familia no tenga que adelantar grandes sumas en momentos difíciles.`;
+
 const TEXTO_CIVIL = `Las cuestiones civiles y de familia atraviesan los momentos más sensibles de la vida: una herencia, una separación, un accidente, un contrato incumplido. Mi enfoque combina rigor técnico con un acompañamiento humano y discreto, buscando primero la solución negociada y llegando a juicio sólo cuando es necesario para proteger tus derechos.
 
-Atiendo sucesiones testamentarias e intestadas, declaratorias de herederos y partición de bienes; divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
+Atiendo divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
 
 const App = () => {
   const [currentView, setCurrentView] = useState('home');
@@ -121,6 +127,7 @@ const App = () => {
             <nav className="hidden md:flex space-x-8 items-center">
               <button onClick={() => navigateTo('home')} className={`hover:text-amber-400 transition-colors ${currentView === 'home' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Inicio</button>
               <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
+              <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
               <a
@@ -152,6 +159,7 @@ const App = () => {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <button onClick={() => navigateTo('home')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Inicio</button>
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
+              <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
               <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-3 py-2 text-base font-medium text-green-400 hover:bg-slate-700 rounded-md"><WhatsAppIcon className="h-4 w-4 mr-2" />Consultá por WhatsApp</a>
@@ -164,6 +172,7 @@ const App = () => {
       <main className="flex-grow">
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
+        {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
         {currentView === 'portal' && <ClientPortalView />}
         {currentView === 'contact' && <ContactView />}
@@ -184,6 +193,7 @@ const App = () => {
             <ul className="space-y-2 text-sm">
               <li><button onClick={() => navigateTo('home')} className="hover:text-amber-500 transition-colors">Inicio</button></li>
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
+              <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
               <li><button onClick={() => navigateTo('portal')} className="hover:text-amber-500 transition-colors">Portal del Cliente</button></li>
               <li><button onClick={() => navigateTo('contact')} className="hover:text-amber-500 transition-colors">Formulario de consulta</button></li>
@@ -1113,6 +1123,7 @@ const ContactView = () => {
                 >
                   <option value="">Selecciona un área...</option>
                   <option>Jubilaciones y Pensiones</option>
+                  <option>Sucesiones</option>
                   <option>Derecho Civil y Familia</option>
                   <option>Concursos y Quiebras</option>
                   <option>Consultoría Empresarial / Gestión de Crisis</option>
