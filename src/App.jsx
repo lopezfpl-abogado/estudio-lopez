@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Scale,
   Briefcase,
@@ -17,7 +17,9 @@ import {
   Download,
   CheckCircle,
   Clock,
-  Shield
+  Shield,
+  Newspaper,
+  ArrowRight
 } from 'lucide-react';
 
 // Foto de perfil (embebida como data URI para que renderice en el artifact)
@@ -55,6 +57,9 @@ const FloatingWhatsApp = () => (
     </span>
   </a>
 );
+
+// URL del Apps Script desplegado (Google Sheets backend del Portal)
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx8awTRhfKDp8cNV_rV8YRX1B3UQ49erGNjd5fDAhB-KQEEcN2GuVjuV3eaZ5Pbf9tWg/exec";
 
 // Botón anchor de WhatsApp reutilizable (uso inline)
 const WhatsAppButton = ({ message, children, className = "", size = "md" }) => {
@@ -221,6 +226,114 @@ const App = () => {
 
 /* --- VIEWS --- */
 
+const NovedadesSection = () => {
+  const [novedades, setNovedades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchNovedades = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=novedades");
+        if (!response.ok) throw new Error("Network error");
+        const data = await response.json();
+        if (data.ok && data.novedades) {
+          setNovedades(data.novedades.slice(0, 4)); // Mostrar máximo 4
+        } else {
+          setError(true);
+        }
+      } catch (e) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNovedades();
+  }, []);
+
+  // Si no hay novedades cargadas y ya terminó de cargar, no mostrar la sección
+  if (!loading && (error || novedades.length === 0)) {
+    return null;
+  }
+
+  return (
+    <section className="py-20 bg-slate-50 border-t border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+            <Newspaper className="h-4 w-4 mr-2" />
+            Novedades del estudio
+          </div>
+          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-3">Últimas actualizaciones</h2>
+          <p className="text-slate-600 max-w-2xl mx-auto">
+            Información reciente sobre cambios normativos, fallos relevantes y novedades que pueden afectar tu trámite.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
+                <div className="h-3 w-24 bg-slate-200 rounded mb-4"></div>
+                <div className="h-5 bg-slate-200 rounded mb-3"></div>
+                <div className="h-5 w-3/4 bg-slate-200 rounded mb-4"></div>
+                <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                <div className="h-3 w-2/3 bg-slate-100 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {novedades.map((nov, i) => {
+              const catColors = {
+                'Jubilaciones': 'bg-blue-100 text-blue-700',
+                'Civil': 'bg-green-100 text-green-700',
+                'Sucesiones': 'bg-violet-100 text-violet-700',
+                'General': 'bg-slate-100 text-slate-700',
+              };
+              const catClass = catColors[nov.categoria] || catColors['General'];
+              return (
+                <article key={i} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                  <div className="flex items-center justify-between mb-3 gap-2">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${catClass}`}>
+                      {nov.categoria}
+                    </span>
+                    <span className="text-xs text-slate-500 flex items-center whitespace-nowrap">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {nov.fecha}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mb-3 leading-snug">
+                    {nov.titulo}
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed flex-grow">
+                    {nov.resumen}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="text-center mt-10">
+          <p className="text-sm text-slate-500">
+            ¿Querés consultar cómo te afecta alguna de estas novedades?{" "}
+            <a
+              href={buildWhatsAppUrl("Hola Dr. López, vi una novedad en su sitio y quería hacer una consulta.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 font-medium inline-flex items-center"
+            >
+              Escribime por WhatsApp <ArrowRight className="h-4 w-4 ml-1" />
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const HomeView = ({ navigateTo }) => (
   <div>
     {/* Hero Section */}
@@ -344,6 +457,9 @@ const HomeView = ({ navigateTo }) => (
         </div>
       </div>
     </section>
+
+    {/* Sección de Novedades (lee de Google Sheets) */}
+    <NovedadesSection />
   </div>
 );
 
@@ -382,10 +498,6 @@ const ServiceDetailView = ({ title, icon, body, navigateTo }) => {
 };
 
 const ClientPortalView = () => {
-  // ===========================================================================
-  // URL del Apps Script desplegado (Paso 2 del Portal con Google Sheets)
-  // ===========================================================================
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx8awTRhfKDp8cNV_rV8YRX1B3UQ49erGNjd5fDAhB-KQEEcN2GuVjuV3eaZ5Pbf9tWg/exec";
 
   const [activeTab, setActiveTab] = useState('casos');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
