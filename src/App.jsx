@@ -19,7 +19,11 @@ import {
   Clock,
   Shield,
   Newspaper,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft,
+  Share2,
+  Copy,
+  BookOpen
 } from 'lucide-react';
 
 // Foto de perfil (embebida como data URI para que renderice en el artifact)
@@ -99,12 +103,402 @@ const TEXTO_CIVIL = `Las cuestiones civiles y de familia atraviesan los momentos
 
 Atiendo divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
 
+// ============================================================================
+// COMPONENTES DEL BLOG
+// ============================================================================
+
+const CATEGORIA_COLORS = {
+  'Jubilaciones': 'bg-blue-100 text-blue-700 border-blue-200',
+  'Civil': 'bg-green-100 text-green-700 border-green-200',
+  'Sucesiones': 'bg-violet-100 text-violet-700 border-violet-200',
+  'General': 'bg-slate-100 text-slate-700 border-slate-200',
+};
+
+// Tarjeta de artículo (usada en listado y en relacionados)
+const BlogCard = ({ articulo, navigateTo, compact = false }) => {
+  const catClass = CATEGORIA_COLORS[articulo.categoria] || CATEGORIA_COLORS['General'];
+  return (
+    <article
+      onClick={() => navigateTo('blog-post', articulo.slug)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-300 transition-all cursor-pointer flex flex-col group"
+    >
+      {articulo.imagen && (
+        <div className={`overflow-hidden bg-slate-100 ${compact ? 'h-40' : 'h-48'}`}>
+          <img
+            src={articulo.imagen}
+            alt={articulo.titulo}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+        </div>
+      )}
+      <div className={`p-5 flex flex-col flex-grow ${compact ? '' : 'p-6'}`}>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${catClass}`}>
+            {articulo.categoria}
+          </span>
+          <span className="text-xs text-slate-500 flex items-center">
+            <Calendar className="h-3 w-3 mr-1" />
+            {articulo.fecha}
+          </span>
+          {articulo.tiempoLectura > 0 && (
+            <span className="text-xs text-slate-500 flex items-center">
+              <Clock className="h-3 w-3 mr-1" />
+              {articulo.tiempoLectura} min
+            </span>
+          )}
+        </div>
+        <h3 className={`font-serif font-bold text-slate-900 mb-2 leading-snug group-hover:text-amber-700 transition-colors ${compact ? 'text-base' : 'text-lg'}`}>
+          {articulo.titulo}
+        </h3>
+        {!compact && articulo.subtitulo && (
+          <p className="text-sm text-slate-600 italic mb-3">{articulo.subtitulo}</p>
+        )}
+        <p className={`text-slate-600 leading-relaxed flex-grow ${compact ? 'text-xs line-clamp-3' : 'text-sm line-clamp-4'}`}>
+          {articulo.resumen}
+        </p>
+        <div className="mt-4 text-amber-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform">
+          Leer artículo <ArrowRight className="h-4 w-4 ml-1" />
+        </div>
+      </div>
+    </article>
+  );
+};
+
+// Listado completo de artículos
+const BlogListView = ({ navigateTo }) => {
+  const [articulos, setArticulos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filtroCategoria, setFiltroCategoria] = useState('Todas');
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-list");
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok) {
+          setArticulos(data.articulos || []);
+        } else {
+          setError(data.error || 'No se pudieron cargar los artículos');
+        }
+      } catch (e) {
+        setError('No pudimos cargar el blog. Intentá refrescar la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlog();
+  }, []);
+
+  const categorias = ['Todas', 'Jubilaciones', 'Civil', 'Sucesiones', 'General'];
+  const articulosFiltrados = filtroCategoria === 'Todas'
+    ? articulos
+    : articulos.filter(a => a.categoria === filtroCategoria);
+
+  return (
+    <div className="py-16 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-6">
+            <BookOpen className="h-8 w-8 text-amber-600" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Blog del estudio</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Análisis, novedades y guías prácticas sobre jubilaciones, sucesiones y derecho civil.
+          </p>
+        </div>
+
+        {/* Filtros por categoría */}
+        {!loading && articulos.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-center mb-10">
+            {categorias.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setFiltroCategoria(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                  filtroCategoria === cat
+                    ? 'bg-slate-900 text-white border-slate-900'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-amber-300 hover:text-amber-700'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Estados */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse">
+                <div className="h-48 bg-slate-200"></div>
+                <div className="p-6">
+                  <div className="h-3 w-24 bg-slate-200 rounded mb-3"></div>
+                  <div className="h-5 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-5 w-3/4 bg-slate-200 rounded mb-4"></div>
+                  <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                  <div className="h-3 w-2/3 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && articulosFiltrados.length === 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-12 text-center">
+            <Newspaper className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+            <p className="text-amber-900 font-medium text-lg">
+              {filtroCategoria === 'Todas'
+                ? 'Todavía no hay artículos publicados.'
+                : `No hay artículos en la categoría "${filtroCategoria}" todavía.`}
+            </p>
+            <p className="text-sm text-amber-700 mt-2">Pronto vamos a estar publicando novedades aquí.</p>
+          </div>
+        )}
+
+        {!loading && !error && articulosFiltrados.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articulosFiltrados.map((art, i) => (
+              <BlogCard key={i} articulo={art} navigateTo={navigateTo} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Vista de un artículo individual
+const BlogPostView = ({ slug, navigateTo }) => {
+  const [post, setPost] = useState(null);
+  const [relacionados, setRelacionados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    if (!slug) {
+      setError('Artículo no encontrado');
+      setLoading(false);
+      return;
+    }
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-post&slug=" + encodeURIComponent(slug));
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok && data.articulo) {
+          setPost(data.articulo);
+          setRelacionados(data.relacionados || []);
+        } else {
+          setError(data.error || 'No encontramos el artículo');
+        }
+      } catch (e) {
+        setError('No pudimos cargar el artículo. Intentá refrescar la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  const url = typeof window !== 'undefined' ? window.location.origin + '/blog/' + slug : '';
+
+  const compartirWhatsApp = () => {
+    if (!post) return;
+    const texto = encodeURIComponent(post.titulo + ' — ' + url);
+    window.open('https://wa.me/?text=' + texto, '_blank');
+  };
+
+  const copiarLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch (e) {
+      // fallback silencioso
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-4 w-24 bg-slate-200 rounded mb-6"></div>
+            <div className="h-12 bg-slate-200 rounded mb-4"></div>
+            <div className="h-12 w-2/3 bg-slate-200 rounded mb-8"></div>
+            <div className="h-72 bg-slate-200 rounded-xl mb-8"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 w-5/6 bg-slate-100 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Newspaper className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-serif font-bold text-slate-900 mb-4">Artículo no disponible</h1>
+          <p className="text-slate-600 mb-8">{error || 'No encontramos lo que estabas buscando.'}</p>
+          <button
+            onClick={() => navigateTo('blog')}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-md font-medium transition-colors inline-flex items-center"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" /> Volver al blog
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const catClass = CATEGORIA_COLORS[post.categoria] || CATEGORIA_COLORS['General'];
+  const parrafos = post.cuerpo.split(/\n\s*\n/);
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+
+        {/* Volver al blog */}
+        <button
+          onClick={() => navigateTo('blog')}
+          className="text-sm text-slate-600 hover:text-amber-600 font-medium mb-6 inline-flex items-center transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" /> Volver al blog
+        </button>
+
+        {/* Header del artículo */}
+        <header className="mb-8">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${catClass}`}>
+              {post.categoria}
+            </span>
+            <span className="text-sm text-slate-500 flex items-center">
+              <Calendar className="h-4 w-4 mr-1" />
+              {post.fecha}
+            </span>
+            {post.tiempoLectura > 0 && (
+              <span className="text-sm text-slate-500 flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                {post.tiempoLectura} min de lectura
+              </span>
+            )}
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 leading-tight mb-4">
+            {post.titulo}
+          </h1>
+          {post.subtitulo && (
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed italic">
+              {post.subtitulo}
+            </p>
+          )}
+        </header>
+
+        {/* Imagen destacada */}
+        {post.imagen && (
+          <div className="mb-10 rounded-xl overflow-hidden bg-slate-100 shadow-md">
+            <img
+              src={post.imagen}
+              alt={post.titulo}
+              className="w-full h-auto object-cover"
+              onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
+        {/* Cuerpo del artículo */}
+        <div className="prose prose-slate max-w-none">
+          {parrafos.map((p, i) => (
+            <p key={i} className="text-slate-800 text-lg leading-relaxed mb-6">
+              {p}
+            </p>
+          ))}
+        </div>
+
+        {/* Compartir + CTA WhatsApp */}
+        <div className="mt-12 pt-8 border-t border-slate-200">
+          <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
+            <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
+              ¿Tenés una consulta sobre este tema?
+            </h3>
+            <p className="text-slate-700 mb-5 leading-relaxed">
+              Escribinos por WhatsApp y te orientamos sobre tu caso particular. La primera consulta es sin costo.
+            </p>
+            <a
+              href={buildWhatsAppUrl('Hola Dr. López, leí su artículo "' + post.titulo + '" y quería hacerle una consulta.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
+            >
+              <WhatsAppIcon className="h-5 w-5 mr-2" />
+              Consultar por WhatsApp
+            </a>
+          </div>
+
+          {/* Botones compartir */}
+          <div className="mt-8 flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-semibold text-slate-700 flex items-center">
+              <Share2 className="h-4 w-4 mr-2" /> Compartir:
+            </span>
+            <button
+              onClick={compartirWhatsApp}
+              className="bg-white hover:bg-green-50 border border-green-600 text-green-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <WhatsAppIcon className="h-4 w-4 mr-2" /> WhatsApp
+            </button>
+            <button
+              onClick={copiarLink}
+              className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <Copy className="h-4 w-4 mr-2" /> {copiado ? '¡Copiado!' : 'Copiar link'}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      {/* Artículos relacionados */}
+      {relacionados.length > 0 && (
+        <section className="bg-white border-t border-slate-200 py-12 mt-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8">Otros artículos sobre {post.categoria}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relacionados.map((art, i) => (
+                <BlogCard key={i} articulo={art} navigateTo={navigateTo} compact />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+};
+
+
 const App = () => {
   const [currentView, setCurrentView] = useState('home');
+  const [currentSlug, setCurrentSlug] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navigateTo = (view) => {
+  const navigateTo = (view, slug = null) => {
     setCurrentView(view);
+    setCurrentSlug(slug);
     setIsMobileMenuOpen(false);
     window.scrollTo(0, 0);
   };
@@ -134,6 +528,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
+              <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
               <a
                 href={buildWhatsAppUrl()}
@@ -166,6 +561,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
               <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-3 py-2 text-base font-medium text-green-400 hover:bg-slate-700 rounded-md"><WhatsAppIcon className="h-4 w-4 mr-2" />Consultá por WhatsApp</a>
             </div>
@@ -179,6 +575,8 @@ const App = () => {
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
+        {currentView === 'blog' && <BlogListView navigateTo={navigateTo} />}
+        {currentView === 'blog-post' && <BlogPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'portal' && <ClientPortalView />}
         {currentView === 'contact' && <ContactView />}
       </main>
@@ -200,6 +598,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
+              <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
               <li><button onClick={() => navigateTo('portal')} className="hover:text-amber-500 transition-colors">Portal del Cliente</button></li>
               <li><button onClick={() => navigateTo('contact')} className="hover:text-amber-500 transition-colors">Formulario de consulta</button></li>
             </ul>
