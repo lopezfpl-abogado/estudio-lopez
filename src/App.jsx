@@ -104,6 +104,211 @@ const TEXTO_CIVIL = `Las cuestiones civiles y de familia atraviesan los momentos
 Atiendo divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
 
 // ============================================================================
+// COMPONENTE QUIÉN SOY (página de trayectoria profesional)
+// ============================================================================
+
+const HitoBlock = ({ titulo, periodo, items }) => (
+  <div className="mb-8">
+    <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3 pb-2 border-b border-slate-200">
+      <h3 className="text-lg md:text-xl font-serif font-bold text-slate-900">{titulo}</h3>
+      {periodo && <span className="text-sm text-amber-600 font-medium">{periodo}</span>}
+    </div>
+    <ul className="space-y-2">
+      {items.map((item, i) => (
+        <li key={i} className="flex items-start text-slate-700 leading-relaxed">
+          <span className="text-amber-500 mr-2 mt-1.5 flex-shrink-0">•</span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
+const QuienSoyView = ({ navigateTo }) => {
+  const hitos = [
+    {
+      titulo: 'Formación',
+      periodo: '1989',
+      items: [
+        'Abogado, Universidad Nacional de La Plata (UNLP)',
+        'Matrícula vigente en el Colegio de Abogados de Dolores desde 1989',
+      ],
+    },
+    {
+      titulo: 'Ejercicio privado y gremial',
+      periodo: '1989 — 2009',
+      items: [
+        'Sindicatura de quiebras y concursos: aproximadamente 40 procesos',
+        'Estudio Jurídico López & Zabalza, La Plata: socio fundador, especialización en derecho laboral, comercial y empresarial',
+        'Departamento Jurídico de YPF: 1.500 juicios bajo seguimiento',
+        'Asesoría legal del Sindicato SOEME: 18 años de continuidad',
+      ],
+    },
+    {
+      titulo: 'Investigación y políticas públicas',
+      periodo: '1996 — 2008',
+      items: [
+        'Presidente y Consultor del CEPADE (Centro de Estudios para el Desarrollo)',
+        'Estudios sobre canasta básica familiar, desocupación regional y análisis de coyuntura',
+        'Diseño de seminarios y proyectos de investigación socio-económica',
+      ],
+    },
+    {
+      titulo: 'Función pública nacional',
+      periodo: '2000 — 2001',
+      items: [
+        'Coordinador y Jefe de Gabinete, Subsecretaría de Promoción Social y Secretaría de Políticas Sociales del Ministerio de Desarrollo Social y Medio Ambiente de la Nación',
+        'Responsable de distribución alimentaria a nivel nacional',
+        'Negociación con movimientos sociales durante la crisis 2001',
+      ],
+    },
+    {
+      titulo: 'Función pública provincial',
+      periodo: '2004 — 2008',
+      items: [
+        'Director Provincial de Regiones, Patronato de Liberados Bonaerense',
+        'Responsable de la Unidad Presidencia',
+        'Plan de Fortalecimiento: 170 sedes, 980 agentes, 78 cargos jerárquicos',
+        'Modernización tecnológica de la ejecución penal: legajo electrónico tutelar',
+        'Monitoreo de 48.000 personas tuteladas',
+        'Participación en la Reforma de Política Criminal de la Provincia',
+      ],
+    },
+    {
+      titulo: 'Gestión empresarial y directorios',
+      periodo: '2009 — 2012',
+      items: [
+        'Gerente General, Fideicomiso Empresa Papelera Quilmes (ex Massuh SA): 520 trabajadores en 3 plantas',
+        'Asesor del Estado en Papel Prensa SA, en representación accionaria',
+        'Director en ALL — América Latina Logística Argentina S.A. (transporte ferroviario de cargas)',
+        'Consultor y supervisor de Bapro Mandatos y Negocios SA: actualización de manuales, control interno, evaluación tecnológica de sistemas de fideicomisos',
+      ],
+    },
+    {
+      titulo: 'Transformación digital y gestión de sistemas',
+      periodo: '2013 — 2024',
+      items: [
+        'Director de Recursos Humanos Ferroviarios SACPEM (luego DECHAF): sistemas de RR.HH. para 22.000 empleados, manuales de procedimientos, tableros de monitoreo',
+        'Proyecto de Digitalización de Legajos: 500.000 documentos relevados y digitalizados',
+        'Coordinación de impresión de infracciones de tránsito provinciales (2018-2019)',
+        'Director de Atención a la Ciudadanía, Subsecretaría de Gobierno Digital de Buenos Aires: 350 personas a cargo, gestión del 148, servicios online y chatbot de atención automática (2022-2024)',
+      ],
+    },
+  ];
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <div className="flex-shrink-0">
+              <img
+                src={profilePhoto}
+                alt="Juan Fernando López"
+                className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 border-amber-400 shadow-2xl"
+              />
+            </div>
+            <div className="flex-grow text-center md:text-left">
+              <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                <Briefcase className="h-3 w-3 mr-1.5" />
+                TRAYECTORIA PROFESIONAL
+              </div>
+              <h1 className="text-3xl md:text-5xl font-serif font-bold mb-3">Quién soy</h1>
+              <p className="text-lg md:text-xl text-slate-300 leading-relaxed">
+                Juan Fernando López — Abogado UNLP (1989). Más de 35 años de práctica jurídica con experiencia integrada en función pública de alto nivel, dirección de empresas y proyectos de transformación digital.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Resumen narrativo */}
+      <section className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="prose prose-slate max-w-none">
+            <p className="text-lg text-slate-800 leading-relaxed mb-6">
+              Soy abogado, recibido en la Universidad Nacional de La Plata en 1989 y matriculado en el Colegio de Abogados de Dolores. Llevo más de 35 años de ejercicio profesional ininterrumpido, una trayectoria que combina algo poco habitual: práctica en derecho privado y empresarial, asesoramiento gremial sostenido en el tiempo, y experiencia real en alta dirección en organismos del Estado y empresas con miles de empleados a cargo.
+            </p>
+            <p className="text-lg text-slate-800 leading-relaxed mb-6">
+              Empecé como abogado de sindicatura en concursos y quiebras en Dolores, mi ciudad natal. A los seis meses ingresé al Departamento Jurídico de YPF, donde trabajé con un volumen que pocos jóvenes abogados manejan: aproximadamente <strong>1.500 juicios bajo seguimiento</strong>, recursos extraordinarios y control licitatorio. En paralelo, fundé un estudio propio en La Plata especializado en derecho laboral, comercial y empresarial, que sostuve casi una década, y asumí la representación legal del Sindicato de Obreros y Empleados de la Minoridad y la Educación, una relación que duró <strong>18 años</strong>.
+            </p>
+            <p className="text-lg text-slate-800 leading-relaxed mb-6">
+              Esa formación combinada —estudio privado, empresa, gremio— me dio una mirada que después se profundizó cuando entré a la función pública. Fui Coordinador y Jefe de Gabinete en el Ministerio de Desarrollo Social y Medio Ambiente de la Nación durante la crisis del 2001, responsable de la distribución alimentaria nacional y la negociación con movimientos sociales en la sede ministerial. Después dirigí la Unidad Presidencia del Patronato de Liberados Bonaerense, donde lideré la implementación de un Plan de Fortalecimiento que llegó a <strong>170 sedes, 980 agentes y el monitoreo electrónico de 48.000 personas tuteladas</strong>.
+            </p>
+            <p className="text-lg text-slate-800 leading-relaxed mb-6">
+              A partir de 2009 mi rol fue cambiando hacia la gestión empresarial directa. Fui Gerente General del fideicomiso de la ex Massuh (papel y celulosa), con <strong>520 trabajadores en tres plantas</strong>; integré el equipo de asesores del Estado en Papel Prensa SA; fui Director en representación del Estado en ALL Argentina, una empresa de transporte ferroviario de cargas con capitales mayoritariamente brasileños; y supervisé procesos de control interno y digitalización en Bapro Mandatos.
+            </p>
+            <p className="text-lg text-slate-800 leading-relaxed mb-6">
+              En los últimos diez años me especialicé en algo que hoy es central para cualquier empresa: <strong>la transformación digital aplicada a la gestión administrativa</strong>. Dirigí los sistemas de Recursos Humanos para una empresa con 22.000 empleados ferroviarios, lideré un proyecto de digitalización de 500.000 legajos en guarda, y más recientemente fui Director de Atención a la Ciudadanía en la Provincia de Buenos Aires, a cargo de un equipo de 350 personas que gestionaba el centro telefónico 148, los servicios online y el chatbot de atención automática.
+            </p>
+            <p className="text-lg text-slate-800 leading-relaxed">
+              Esta combinación es la que define mi forma de trabajar hoy. Cuando un cliente me consulta sobre un contrato, una sucesión o un conflicto laboral, no veo solo el expediente: veo el flujo administrativo, el impacto operativo, la lógica del negocio. Cuarenta años de práctica jurídica con experiencia simultánea en gestión empresarial, función pública y digitalización me dan una visión integral que pocos asesores legales pueden ofrecer.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Hitos profesionales */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full mb-3">
+              <Clock className="h-3 w-3 mr-1.5" />
+              HITOS PROFESIONALES
+            </div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">35 años de carrera, 7 etapas</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              Una trayectoria que recorre el ejercicio privado, la función pública, la dirección empresarial y los proyectos de transformación digital.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 md:p-10 shadow-sm border border-slate-200">
+            {hitos.map((bloque, i) => (
+              <HitoBlock key={i} titulo={bloque.titulo} periodo={bloque.periodo} items={bloque.items} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Diferencial / cierre */}
+      <section className="py-16 bg-slate-900 text-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Mi diferencial</h2>
+          </div>
+          <blockquote className="text-lg md:text-xl text-slate-200 leading-relaxed italic border-l-4 border-amber-500 pl-6 mb-6">
+            No soy un abogado de despacho. Cuarenta años de práctica me llevaron por estudios privados, gremios, ministerios, directorios de empresas y proyectos de digitalización masivos. Esa diversidad me permite entender a mis clientes desde múltiples ángulos: el del expediente, el del flujo de caja, el del equipo a cargo y el del sistema administrativo que sostiene todo.
+          </blockquote>
+          <blockquote className="text-lg md:text-xl text-slate-200 leading-relaxed italic border-l-4 border-amber-500 pl-6">
+            Cuando me consultan, no doy una respuesta legal abstracta: doy una respuesta integrada al negocio o a la situación familiar concreta de quien me consulta.
+          </blockquote>
+        </div>
+      </section>
+
+      {/* CTA final */}
+      <section className="py-16 bg-gradient-to-br from-green-50 to-amber-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3">¿Querés conversar sobre tu caso?</h2>
+          <p className="text-slate-700 mb-8 leading-relaxed">
+            La primera consulta es sin cargo. Escribime por WhatsApp y vemos juntos cómo puedo ayudarte.
+          </p>
+          <a
+            href={buildWhatsAppUrl('Hola Dr. López, vi su sitio y quería hacerle una consulta.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 hover:bg-green-600 text-white font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+          >
+            <WhatsAppIcon className="h-6 w-6 mr-3" />
+            Consultar por WhatsApp
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============================================================================
 // COMPONENTES DE NOVEDADES DEL DERECHO
 // ============================================================================
 
@@ -1385,6 +1590,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
+              <button onClick={() => navigateTo('quien-soy')} className={`hover:text-amber-400 transition-colors ${currentView === 'quien-soy' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
@@ -1419,6 +1625,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              <button onClick={() => navigateTo('quien-soy')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
@@ -1434,6 +1641,7 @@ const App = () => {
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
+        {currentView === 'quien-soy' && <QuienSoyView navigateTo={navigateTo} />}
         {currentView === 'novedades' && <NovedadesListView navigateTo={navigateTo} />}
         {currentView === 'novedad-post' && <NovedadPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'blog' && <BlogListView navigateTo={navigateTo} />}
@@ -1461,6 +1669,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
+              <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
               <li><button onClick={() => navigateTo('portal')} className="hover:text-amber-500 transition-colors">Portal del Cliente</button></li>
