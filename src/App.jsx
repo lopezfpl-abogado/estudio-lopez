@@ -104,6 +104,321 @@ const TEXTO_CIVIL = `Las cuestiones civiles y de familia atraviesan los momentos
 Atiendo divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
 
 // ============================================================================
+// COMPONENTES DE ASESORAMIENTO EMPRESARIAL
+// ============================================================================
+
+// Banner destacado para la home
+const AsesoramientoEmpresarialBanner = ({ navigateTo }) => {
+  return (
+    <section className="py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+      {/* Decoración geométrica */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
+          <div className="lg:col-span-3">
+            <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
+              <Briefcase className="h-3 w-3 mr-1.5" />
+              ASESORAMIENTO EMPRESARIAL
+            </div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4 leading-tight">
+              El mejor conflicto legal es el que se previene.
+            </h2>
+            <p className="text-lg text-slate-300 leading-relaxed mb-6">
+              Asesoramiento jurídico permanente para empresas, PyMEs y emprendedores que entienden que la prevención no es gasto: es inversión.
+            </p>
+            <p className="text-base text-slate-400 leading-relaxed mb-8">
+              Trabajo mediante un sistema de <strong className="text-amber-400">Abono Mensual</strong> adaptado a la escala de tu empresa, con disponibilidad inmediata, prioridad de atención y costos previsibles.
+            </p>
+            <button
+              onClick={() => navigateTo('empresas')}
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-lg"
+            >
+              Conocer los planes <ArrowRight className="h-5 w-5 ml-2" />
+            </button>
+          </div>
+          <div className="lg:col-span-2">
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 space-y-4">
+              <div className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-200"><strong className="text-white">Disponibilidad real</strong> por WhatsApp y email todos los días</p>
+              </div>
+              <div className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-200"><strong className="text-white">Costo previsible</strong> sin sorpresas en la facturación</p>
+              </div>
+              <div className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-200"><strong className="text-white">Mirada gerencial</strong>, no solo legal</p>
+              </div>
+              <div className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-200"><strong className="text-white">Tarifa preferencial</strong> para juicios y trámites mayores</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Tarjeta de plan
+const PlanCard = ({ plan, color, destacado, items, mensaje }) => {
+  const colorClasses = {
+    green: { ring: 'ring-green-500', dot: 'bg-green-500', btn: 'bg-green-500 hover:bg-green-600' },
+    blue: { ring: 'ring-amber-500', dot: 'bg-amber-500', btn: 'bg-amber-500 hover:bg-amber-600 text-slate-900' },
+    violet: { ring: 'ring-violet-500', dot: 'bg-violet-500', btn: 'bg-violet-500 hover:bg-violet-600' },
+  };
+  const c = colorClasses[color];
+  return (
+    <div className={`relative bg-white rounded-2xl border-2 ${destacado ? 'border-amber-500 shadow-2xl scale-105' : 'border-slate-200 shadow-sm'} p-6 md:p-8 flex flex-col`}>
+      {destacado && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-4 py-1 rounded-full shadow-md">
+          ★ MÁS ELEGIDO
+        </div>
+      )}
+      <div className={`inline-flex items-center w-fit text-xs font-semibold ${c.dot} text-white px-3 py-1 rounded-full mb-4`}>
+        {plan.tag}
+      </div>
+      <h3 className="text-2xl font-serif font-bold text-slate-900 mb-2">{plan.nombre}</h3>
+      <p className="text-sm text-slate-600 italic mb-6 min-h-[2.5rem]">{plan.descripcion}</p>
+
+      <ul className="space-y-3 mb-8 flex-grow">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-start text-sm text-slate-700 leading-relaxed">
+            <CheckCircle className="h-4 w-4 text-amber-500 mr-2 mt-0.5 flex-shrink-0" />
+            <span dangerouslySetInnerHTML={{ __html: item }} />
+          </li>
+        ))}
+      </ul>
+
+      <a
+        href={buildWhatsAppUrl(mensaje)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${c.btn} text-white font-semibold px-6 py-3 rounded-md transition-colors inline-flex items-center justify-center shadow-md w-full`}
+      >
+        <WhatsAppIcon className="h-5 w-5 mr-2" />
+        Cotizar por WhatsApp
+      </a>
+    </div>
+  );
+};
+
+// Página completa de Asesoramiento Empresarial
+const AsesoramientoEmpresarialView = ({ navigateTo }) => {
+  return (
+    <div className="bg-slate-50 min-h-screen">
+
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
+            <Briefcase className="h-3 w-3 mr-1.5" />
+            ASESORAMIENTO EMPRESARIAL
+          </div>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+            El mejor conflicto legal es el que se previene.
+          </h1>
+          <p className="text-xl md:text-2xl text-slate-300 leading-relaxed">
+            Asesoramiento jurídico permanente para empresas, PyMEs y emprendedores que entienden que la prevención no es gasto: es inversión.
+          </p>
+        </div>
+      </section>
+
+      {/* Por qué un abogado in-house */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Tu socio legal, no tu proveedor</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Contar con asesoramiento jurídico permanente no es un gasto, es una inversión que blinda el patrimonio y asegura la continuidad del negocio. Cada decisión de hoy es un riesgo o una oportunidad mañana.
+              </p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <Briefcase className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Una mirada que entiende el negocio</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Conozco la dinámica empresarial desde adentro. Mi experiencia en dirección corporativa y digitalización me da una visión integral: entiendo tus urgencias operativas, no solo los plazos legales.
+              </p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Disponibilidad real, costo previsible</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Sistema de Abono Mensual adaptado a la escala de tu empresa: disponibilidad inmediata, prioridad de atención y costos previsibles, sin sorpresas en la facturación.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Diferencial - llamado a Quién Soy */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-8 md:p-12">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">
+                No es lo mismo un abogado que un asesor de confianza
+              </h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Hay muchos abogados que conocen la ley. Muy pocos que también dirigieron empresas, manejaron crisis nacionales, gestionaron equipos de cientos de personas y lideraron proyectos de digitalización masivos.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+              <div className="flex items-start bg-amber-50 border border-amber-200 rounded-lg p-5">
+                <div className="text-3xl font-serif font-bold text-amber-600 mr-4 flex-shrink-0">22.000</div>
+                <p className="text-sm text-slate-700 leading-relaxed">Empleados bajo gestión de RR.HH. en empresa ferroviaria</p>
+              </div>
+              <div className="flex items-start bg-amber-50 border border-amber-200 rounded-lg p-5">
+                <div className="text-3xl font-serif font-bold text-amber-600 mr-4 flex-shrink-0">520</div>
+                <p className="text-sm text-slate-700 leading-relaxed">Trabajadores como Gerente General de fideicomiso productivo</p>
+              </div>
+              <div className="flex items-start bg-amber-50 border border-amber-200 rounded-lg p-5">
+                <div className="text-3xl font-serif font-bold text-amber-600 mr-4 flex-shrink-0">500.000</div>
+                <p className="text-sm text-slate-700 leading-relaxed">Legajos digitalizados en proyecto de transformación administrativa</p>
+              </div>
+              <div className="flex items-start bg-amber-50 border border-amber-200 rounded-lg p-5">
+                <div className="text-3xl font-serif font-bold text-amber-600 mr-4 flex-shrink-0">35+</div>
+                <p className="text-sm text-slate-700 leading-relaxed">Años de práctica en derecho laboral, comercial y empresarial</p>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={() => navigateTo('quien-soy')}
+                className="text-amber-700 hover:text-amber-800 font-semibold inline-flex items-center transition-colors"
+              >
+                Conocer mi trayectoria completa <ArrowRight className="h-5 w-5 ml-1" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3 Planes */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Tres planes, una sola lógica</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Elegí el plan que mejor se adapta a la escala de tu empresa. Honorarios cotizados caso por caso.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-6 items-start pt-6">
+            <PlanCard
+              plan={{ tag: 'EMPRENDEDOR', nombre: 'Plan Emprendedor', descripcion: 'Para monotributistas y empresas hasta 5 empleados' }}
+              color="green"
+              destacado={false}
+              items={[
+                'Consultas <strong>ilimitadas</strong> por WhatsApp y email',
+                'Revisión de hasta <strong>2 contratos por mes</strong>',
+                'Atención de intimaciones y cartas documento',
+                'Asesoramiento laboral preventivo básico',
+                '<strong>1 reunión virtual mensual</strong> de seguimiento',
+                'Tarifa preferencial para juicios y trámites mayores',
+              ]}
+              mensaje="Hola Dr. López, me interesa el Plan Emprendedor para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
+            />
+            <PlanCard
+              plan={{ tag: 'PYME', nombre: 'Plan PyME', descripcion: 'Para empresas de 6 a 25 empleados con operación regular' }}
+              color="blue"
+              destacado={true}
+              items={[
+                'Todo lo del Plan Emprendedor, <strong>más</strong>:',
+                'Revisión y redacción de contratos <strong>sin límite mensual</strong>',
+                'Asistencia ante inspecciones de AFIP, ARBA, Min. Trabajo y municipios',
+                'Redacción de actas de directorio y asambleas (SRL/SA)',
+                'Acompañamiento en negociaciones con proveedores y clientes',
+                '<strong>Reunión presencial o virtual quincenal</strong>',
+                'Auditoría legal preventiva <strong>semestral</strong>',
+              ]}
+              mensaje="Hola Dr. López, me interesa el Plan PyME para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
+            />
+            <PlanCard
+              plan={{ tag: 'CORPORATE', nombre: 'Plan Corporate', descripcion: 'Para empresas con más de 25 empleados o múltiples sociedades' }}
+              color="violet"
+              destacado={false}
+              items={[
+                'Todo lo del Plan PyME, <strong>más</strong>:',
+                'Asesoramiento estratégico para <strong>alta dirección</strong>',
+                'Atención prioritaria <strong>24/7</strong> ante urgencias',
+                'Auditoría legal preventiva <strong>trimestral</strong>',
+                'Soporte en procesos de digitalización y modernización',
+                'Representación en directorios y asambleas',
+                'Coordinación con auditores externos y contadores',
+              ]}
+              mensaje="Hola Dr. López, me interesa el Plan Corporate para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Cómo arrancamos */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Cómo arrancamos</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Un proceso simple y sin compromiso para evaluar si trabajar juntos te conviene.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { num: '1', titulo: 'Reunión inicial', desc: 'Sin compromiso, presencial o por video' },
+              { num: '2', titulo: 'Diagnóstico', desc: 'Revisamos lo legal, lo administrativo y lo digital' },
+              { num: '3', titulo: 'Propuesta personalizada', desc: 'Plan y honorarios adaptados a tu empresa' },
+              { num: '4', titulo: 'Inicio del abono', desc: 'Plazo mínimo de 6 meses para resultados sostenibles' },
+            ].map((paso, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-lg mb-4">
+                  {paso.num}
+                </div>
+                <h3 className="font-serif font-bold text-slate-900 mb-2">{paso.titulo}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{paso.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA final */}
+      <section className="py-16 bg-gradient-to-br from-green-50 to-amber-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">
+            ¿Querés que conversemos sobre tu empresa?
+          </h2>
+          <p className="text-lg text-slate-700 mb-8 leading-relaxed">
+            La primera reunión es sin cargo y sin compromiso. Charlamos sobre tu situación actual y vemos si un abono te conviene.
+          </p>
+          <a
+            href={buildWhatsAppUrl('Hola Dr. López, soy de una empresa interesada en el servicio de Asesoramiento Empresarial. ¿Podemos coordinar una reunión?')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 hover:bg-green-600 text-white font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+          >
+            <WhatsAppIcon className="h-6 w-6 mr-3" />
+            Coordinar reunión por WhatsApp
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============================================================================
 // COMPONENTE QUIÉN SOY (página de trayectoria profesional)
 // ============================================================================
 
@@ -1590,6 +1905,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
+              <button onClick={() => navigateTo('empresas')} className={`hover:text-amber-400 transition-colors ${currentView === 'empresas' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Asesoramiento Empresarial</button>
               <button onClick={() => navigateTo('quien-soy')} className={`hover:text-amber-400 transition-colors ${currentView === 'quien-soy' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
@@ -1625,6 +1941,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              <button onClick={() => navigateTo('empresas')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Asesoramiento Empresarial</button>
               <button onClick={() => navigateTo('quien-soy')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
@@ -1641,6 +1958,7 @@ const App = () => {
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
+        {currentView === 'empresas' && <AsesoramientoEmpresarialView navigateTo={navigateTo} />}
         {currentView === 'quien-soy' && <QuienSoyView navigateTo={navigateTo} />}
         {currentView === 'novedades' && <NovedadesListView navigateTo={navigateTo} />}
         {currentView === 'novedad-post' && <NovedadPostView slug={currentSlug} navigateTo={navigateTo} />}
@@ -1669,6 +1987,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
+              <li><button onClick={() => navigateTo('empresas')} className="hover:text-amber-500 transition-colors">Asesoramiento Empresarial</button></li>
               <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
@@ -1823,6 +2142,8 @@ const HomeView = ({ navigateTo }) => (
       </div>
     </section>
 
+    {/* Bloque destacado: Asesoramiento Empresarial */}
+    <AsesoramientoEmpresarialBanner navigateTo={navigateTo} />
     {/* Sección de Novedades del Derecho (lee de Google Sheets) */}
     <NovedadesDerechoHome navigateTo={navigateTo} />
   </div>
