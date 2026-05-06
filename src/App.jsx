@@ -104,115 +104,255 @@ const TEXTO_CIVIL = `Las cuestiones civiles y de familia atraviesan los momentos
 Atiendo divorcios expresos —de común acuerdo o unilaterales—, compensación económica, régimen de comunicación con hijos y cuota alimentaria; redacción y revisión de contratos de locación, compraventa, comodato y convenios privados; reclamos por daños y perjuicios derivados de accidentes de tránsito, mala praxis o incumplimientos contractuales; desalojos por falta de pago, vencimiento o intrusión; y amparos en materia de salud, consumidor y vivienda.`;
 
 // ============================================================================
-// COMPONENTES DEL BLOG
+// COMPONENTES DE NOVEDADES DEL DERECHO
 // ============================================================================
 
-const CATEGORIA_COLORS = {
-  'Jubilaciones': 'bg-blue-100 text-blue-700 border-blue-200',
-  'Civil': 'bg-green-100 text-green-700 border-green-200',
+const NOVEDADES_CATEGORIA_COLORS = {
+  'Familia': 'bg-pink-100 text-pink-700 border-pink-200',
+  'Laboral': 'bg-blue-100 text-blue-700 border-blue-200',
   'Sucesiones': 'bg-violet-100 text-violet-700 border-violet-200',
+  'Civil': 'bg-green-100 text-green-700 border-green-200',
   'General': 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
-// Tarjeta de artículo (usada en listado y en relacionados)
-const BlogCard = ({ articulo, navigateTo, compact = false }) => {
-  const catClass = CATEGORIA_COLORS[articulo.categoria] || CATEGORIA_COLORS['General'];
+// Renderiza el cuerpo Markdown-light: ## subtítulos, **negritas**, - listas, "citas" (Autor)
+const renderCuerpoMarkdown = (cuerpo) => {
+  if (!cuerpo) return [];
+
+  // Helper: convertir texto con **negritas** en JSX
+  const formatInline = (text) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
+
+  // Separar por bloques (línea en blanco doble)
+  const bloques = cuerpo.split(/\n\s*\n/).map(b => b.trim()).filter(b => b.length > 0);
+
+  return bloques.map((bloque, idx) => {
+    // Subtítulo H3 (### )
+    if (bloque.startsWith('### ')) {
+      return (
+        <h3 key={idx} className="text-xl md:text-2xl font-serif font-bold text-slate-900 mt-8 mb-3">
+          {formatInline(bloque.replace(/^###\s+/, ''))}
+        </h3>
+      );
+    }
+    // Subtítulo H2 (## )
+    if (bloque.startsWith('## ')) {
+      return (
+        <h2 key={idx} className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mt-10 mb-4 pb-2 border-b border-slate-200">
+          {formatInline(bloque.replace(/^##\s+/, ''))}
+        </h2>
+      );
+    }
+    // Subtítulo H1 (# )
+    if (bloque.startsWith('# ')) {
+      return (
+        <h2 key={idx} className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mt-10 mb-4">
+          {formatInline(bloque.replace(/^#\s+/, ''))}
+        </h2>
+      );
+    }
+    // Lista con - o *
+    if (/^[-*]\s+/.test(bloque)) {
+      const items = bloque.split('\n').filter(l => /^[-*]\s+/.test(l));
+      return (
+        <ul key={idx} className="list-disc pl-6 mb-6 space-y-2 text-slate-800 text-lg">
+          {items.map((item, i) => (
+            <li key={i} className="leading-relaxed">{formatInline(item.replace(/^[-*]\s+/, ''))}</li>
+          ))}
+        </ul>
+      );
+    }
+    // Cita: párrafo que empieza y termina con comilla, con (Autor) opcional al final
+    const citaMatch = bloque.match(/^["“]([\s\S]+?)["”](?:\s*\(([^)]+)\))?\s*$/);
+    if (citaMatch) {
+      return (
+        <blockquote key={idx} className="border-l-4 border-amber-500 bg-amber-50/50 pl-6 pr-4 py-4 my-8 italic text-slate-700">
+          <p className="text-lg leading-relaxed">"{formatInline(citaMatch[1])}"</p>
+          {citaMatch[2] && (
+            <footer className="mt-3 text-sm not-italic text-slate-600 font-semibold">— {citaMatch[2]}</footer>
+          )}
+        </blockquote>
+      );
+    }
+    // Párrafo normal
+    return (
+      <p key={idx} className="text-slate-800 text-lg leading-relaxed mb-6">
+        {formatInline(bloque)}
+      </p>
+    );
+  });
+};
+
+// Tarjeta de novedad (usada en home y en listado)
+const NovedadCard = ({ novedad, navigateTo, compact = false }) => {
+  const catClass = NOVEDADES_CATEGORIA_COLORS[novedad.categoria] || NOVEDADES_CATEGORIA_COLORS['General'];
   return (
     <article
-      onClick={() => navigateTo('blog-post', articulo.slug)}
+      onClick={() => navigateTo('novedad-post', novedad.slug)}
       className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-300 transition-all cursor-pointer flex flex-col group"
     >
-      {articulo.imagen && (
-        <div className={`overflow-hidden bg-slate-100 ${compact ? 'h-40' : 'h-48'}`}>
+      {novedad.imagen && (
+        <div className={`overflow-hidden bg-slate-100 ${compact ? 'h-32' : 'h-44'}`}>
           <img
-            src={articulo.imagen}
-            alt={articulo.titulo}
+            src={novedad.imagen}
+            alt={novedad.titulo}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => { e.target.style.display = 'none'; }}
+            onError={(e) => { e.target.parentElement.style.display = 'none'; }}
           />
         </div>
       )}
-      <div className={`p-5 flex flex-col flex-grow ${compact ? '' : 'p-6'}`}>
+      <div className="p-5 flex flex-col flex-grow">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${catClass}`}>
-            {articulo.categoria}
+          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catClass}`}>
+            {novedad.categoria}
           </span>
           <span className="text-xs text-slate-500 flex items-center">
             <Calendar className="h-3 w-3 mr-1" />
-            {articulo.fecha}
+            {novedad.fecha}
           </span>
-          {articulo.tiempoLectura > 0 && (
-            <span className="text-xs text-slate-500 flex items-center">
-              <Clock className="h-3 w-3 mr-1" />
-              {articulo.tiempoLectura} min
-            </span>
-          )}
         </div>
-        <h3 className={`font-serif font-bold text-slate-900 mb-2 leading-snug group-hover:text-amber-700 transition-colors ${compact ? 'text-base' : 'text-lg'}`}>
-          {articulo.titulo}
+        <h3 className="font-serif font-bold text-slate-900 mb-2 leading-snug group-hover:text-amber-700 transition-colors text-base">
+          {novedad.titulo}
         </h3>
-        {!compact && articulo.subtitulo && (
-          <p className="text-sm text-slate-600 italic mb-3">{articulo.subtitulo}</p>
-        )}
-        <p className={`text-slate-600 leading-relaxed flex-grow ${compact ? 'text-xs line-clamp-3' : 'text-sm line-clamp-4'}`}>
-          {articulo.resumen}
+        <p className="text-slate-600 text-sm leading-relaxed flex-grow line-clamp-3">
+          {novedad.resumen}
         </p>
-        <div className="mt-4 text-amber-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform">
-          Leer artículo <ArrowRight className="h-4 w-4 ml-1" />
+        <div className="mt-3 text-amber-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform">
+          Leer más <ArrowRight className="h-4 w-4 ml-1" />
         </div>
       </div>
     </article>
   );
 };
 
-// Listado completo de artículos
-const BlogListView = ({ navigateTo }) => {
-  const [articulos, setArticulos] = useState([]);
+// Sección de Novedades en la home (4 tarjetas chicas)
+const NovedadesDerechoHome = ({ navigateTo }) => {
+  const [novedades, setNovedades] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNovedades = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=novedades&limit=4");
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok) {
+          setNovedades(data.novedades || []);
+        }
+      } catch (e) {
+        // silencioso, no mostramos sección si falla
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNovedades();
+  }, []);
+
+  if (!loading && novedades.length === 0) return null;
+
+  return (
+    <section className="py-20 bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
+            <Newspaper className="h-3 w-3 mr-1.5" />
+            ACTUALIDAD JURÍDICA
+          </div>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Novedades del Derecho</h2>
+          <p className="text-slate-600 max-w-2xl mx-auto">
+            Análisis y cambios normativos comentados desde mi experiencia profesional.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse">
+                <div className="h-44 bg-slate-200"></div>
+                <div className="p-5">
+                  <div className="h-3 w-24 bg-slate-200 rounded mb-3"></div>
+                  <div className="h-5 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                  <div className="h-3 w-2/3 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {novedades.map((nov, i) => (
+                <NovedadCard key={i} novedad={nov} navigateTo={navigateTo} compact />
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <button
+                onClick={() => navigateTo('novedades')}
+                className="inline-flex items-center text-amber-700 hover:text-amber-800 font-medium transition-colors"
+              >
+                Ver todas las novedades <ArrowRight className="h-4 w-4 ml-1" />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// Listado completo de Novedades (sección propia con filtros)
+const NovedadesListView = ({ navigateTo }) => {
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filtroCategoria, setFiltroCategoria] = useState('Todas');
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchList = async () => {
       try {
-        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-list");
+        const response = await fetch(APPS_SCRIPT_URL + "?action=novedades-list");
         if (!response.ok) throw new Error('Error de red');
         const data = await response.json();
         if (data.ok) {
-          setArticulos(data.articulos || []);
+          setItems(data.novedades || []);
         } else {
-          setError(data.error || 'No se pudieron cargar los artículos');
+          setError(data.error || 'No se pudieron cargar las novedades');
         }
       } catch (e) {
-        setError('No pudimos cargar el blog. Intentá refrescar la página.');
+        setError('No pudimos cargar las novedades. Intentá refrescar la página.');
       } finally {
         setLoading(false);
       }
     };
-    fetchBlog();
+    fetchList();
   }, []);
 
-  const categorias = ['Todas', 'Jubilaciones', 'Civil', 'Sucesiones', 'General'];
-  const articulosFiltrados = filtroCategoria === 'Todas'
-    ? articulos
-    : articulos.filter(a => a.categoria === filtroCategoria);
+  const categorias = ['Todas', 'Familia', 'Laboral', 'Sucesiones', 'Civil', 'General'];
+  const itemsFiltrados = filtroCategoria === 'Todas'
+    ? items
+    : items.filter(a => a.categoria === filtroCategoria);
 
   return (
     <div className="py-16 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-6">
-            <BookOpen className="h-8 w-8 text-amber-600" />
+            <Newspaper className="h-8 w-8 text-amber-600" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Blog del estudio</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Novedades del Derecho</h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Análisis, novedades y guías prácticas sobre jubilaciones, sucesiones y derecho civil.
+            Análisis y cambios normativos en Familia, Laboral, Sucesiones y Civil, comentados desde mi experiencia.
           </p>
         </div>
 
-        {/* Filtros por categoría */}
-        {!loading && articulos.length > 0 && (
+        {!loading && items.length > 0 && (
           <div className="flex flex-wrap gap-2 justify-center mb-10">
             {categorias.map(cat => (
               <button
@@ -230,7 +370,716 @@ const BlogListView = ({ navigateTo }) => {
           </div>
         )}
 
-        {/* Estados */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse">
+                <div className="h-44 bg-slate-200"></div>
+                <div className="p-5">
+                  <div className="h-3 w-24 bg-slate-200 rounded mb-3"></div>
+                  <div className="h-5 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && itemsFiltrados.length === 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-12 text-center">
+            <Newspaper className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+            <p className="text-amber-900 font-medium text-lg">
+              {filtroCategoria === 'Todas'
+                ? 'Todavía no hay novedades publicadas.'
+                : `No hay novedades en la categoría "${filtroCategoria}".`}
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && itemsFiltrados.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {itemsFiltrados.map((n, i) => (
+              <NovedadCard key={i} novedad={n} navigateTo={navigateTo} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Vista de un artículo individual con renderizado de Markdown
+const NovedadPostView = ({ slug, navigateTo }) => {
+  const [post, setPost] = useState(null);
+  const [relacionados, setRelacionados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    if (!slug) {
+      setError('Artículo no encontrado');
+      setLoading(false);
+      return;
+    }
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=novedades-post&slug=" + encodeURIComponent(slug));
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok && data.articulo) {
+          setPost(data.articulo);
+          setRelacionados(data.relacionados || []);
+        } else {
+          setError(data.error || 'No encontramos el artículo');
+        }
+      } catch (e) {
+        setError('No pudimos cargar el artículo. Intentá refrescar la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  const url = typeof window !== 'undefined' ? window.location.origin + '/novedades/' + slug : '';
+
+  const compartirWhatsApp = () => {
+    if (!post) return;
+    const texto = encodeURIComponent(post.titulo + ' — ' + url);
+    window.open('https://wa.me/?text=' + texto, '_blank');
+  };
+
+  const copiarLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch (e) { /* ignore */ }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-4 w-24 bg-slate-200 rounded mb-6"></div>
+            <div className="h-12 bg-slate-200 rounded mb-4"></div>
+            <div className="h-72 bg-slate-200 rounded-xl mb-8"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 w-5/6 bg-slate-100 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Newspaper className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-serif font-bold text-slate-900 mb-4">Artículo no disponible</h1>
+          <p className="text-slate-600 mb-8">{error || 'No encontramos lo que estabas buscando.'}</p>
+          <button
+            onClick={() => navigateTo('novedades')}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-md font-medium transition-colors inline-flex items-center"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" /> Volver a Novedades
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const catClass = NOVEDADES_CATEGORIA_COLORS[post.categoria] || NOVEDADES_CATEGORIA_COLORS['General'];
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+        <button
+          onClick={() => navigateTo('novedades')}
+          className="text-sm text-slate-600 hover:text-amber-600 font-medium mb-6 inline-flex items-center transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" /> Volver a Novedades
+        </button>
+
+        <header className="mb-8">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${catClass}`}>
+              {post.categoria}
+            </span>
+            <span className="text-sm text-slate-500 flex items-center">
+              <Calendar className="h-4 w-4 mr-1" />
+              {post.fecha}
+            </span>
+            {post.tiempoLectura > 0 && (
+              <span className="text-sm text-slate-500 flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                {post.tiempoLectura} min de lectura
+              </span>
+            )}
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 leading-tight mb-4">
+            {post.titulo}
+          </h1>
+          {post.resumen && (
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed italic border-l-4 border-amber-400 pl-4">
+              {post.resumen}
+            </p>
+          )}
+        </header>
+
+        {post.imagen && (
+          <div className="mb-10 rounded-xl overflow-hidden bg-slate-100 shadow-md">
+            <img
+              src={post.imagen}
+              alt={post.titulo}
+              className="w-full h-auto object-cover"
+              onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
+        <div className="prose prose-slate max-w-none">
+          {renderCuerpoMarkdown(post.cuerpo)}
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-slate-200">
+          <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
+            <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
+              ¿Tenés dudas sobre cómo te afecta esto?
+            </h3>
+            <p className="text-slate-700 mb-5 leading-relaxed">
+              Cada situación es particular. Escribime por WhatsApp y vemos juntos cómo aplica este cambio normativo a tu caso concreto.
+            </p>
+            <a
+              href={buildWhatsAppUrl('Hola Dr. López, leí su artículo "' + post.titulo + '" y quería hacerle una consulta.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
+            >
+              <WhatsAppIcon className="h-5 w-5 mr-2" />
+              Consultar por WhatsApp
+            </a>
+          </div>
+
+          <div className="mt-8 flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-semibold text-slate-700 flex items-center">
+              <Share2 className="h-4 w-4 mr-2" /> Compartir:
+            </span>
+            <button
+              onClick={compartirWhatsApp}
+              className="bg-white hover:bg-green-50 border border-green-600 text-green-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <WhatsAppIcon className="h-4 w-4 mr-2" /> WhatsApp
+            </button>
+            <button
+              onClick={copiarLink}
+              className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <Copy className="h-4 w-4 mr-2" /> {copiado ? '¡Copiado!' : 'Copiar link'}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      {relacionados.length > 0 && (
+        <section className="bg-white border-t border-slate-200 py-12 mt-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8">Otras novedades sobre {post.categoria}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relacionados.map((n, i) => (
+                <NovedadCard key={i} novedad={n} navigateTo={navigateTo} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// COMPONENTES DEL BLOG (relatos personales/profesionales)
+// ============================================================================
+
+const BlogCard = ({ entrada, navigateTo }) => {
+  return (
+    <article
+      onClick={() => navigateTo('blog-post', entrada.slug)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-300 transition-all cursor-pointer flex flex-col group"
+    >
+      {entrada.imagen && (
+        <div className="overflow-hidden bg-slate-100 relative h-48">
+          <img
+            src={entrada.imagen}
+            alt={entrada.titulo}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+          />
+          {entrada.tieneVideo && (
+            <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center shadow-md">
+              <svg className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Video
+            </div>
+          )}
+        </div>
+      )}
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-xs text-slate-500 flex items-center">
+            <Calendar className="h-3 w-3 mr-1" />
+            {entrada.fecha}
+          </span>
+          {entrada.tiempoLectura > 0 && (
+            <span className="text-xs text-slate-500 flex items-center">
+              <Clock className="h-3 w-3 mr-1" />
+              {entrada.tiempoLectura} min
+            </span>
+          )}
+        </div>
+        <h3 className="font-serif font-bold text-slate-900 mb-2 leading-snug group-hover:text-amber-700 transition-colors text-lg">
+          {entrada.titulo}
+        </h3>
+        {entrada.subtitulo && (
+          <p className="text-sm text-slate-600 italic mb-3">{entrada.subtitulo}</p>
+        )}
+        <p className="text-slate-600 text-sm leading-relaxed flex-grow line-clamp-4">
+          {entrada.resumen}
+        </p>
+        <div className="mt-4 text-amber-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform">
+          Leer relato <ArrowRight className="h-4 w-4 ml-1" />
+        </div>
+      </div>
+    </article>
+  );
+};
+
+// Listado completo del Blog (sin categorías, ordenado cronológicamente)
+const BlogListView = ({ navigateTo }) => {
+  const [entradas, setEntradas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchList = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-list");
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok) {
+          setEntradas(data.entradas || []);
+        } else {
+          setError(data.error || 'No se pudieron cargar las entradas');
+        }
+      } catch (e) {
+        setError('No pudimos cargar el blog. Intentá refrescar la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchList();
+  }, []);
+
+  return (
+    <div className="py-16 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-6">
+            <BookOpen className="h-8 w-8 text-amber-600" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Blog</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Crónicas, recuerdos y reflexiones de mi trayectoria profesional.
+          </p>
+        </div>
+
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse">
+                <div className="h-48 bg-slate-200"></div>
+                <div className="p-6">
+                  <div className="h-3 w-24 bg-slate-200 rounded mb-3"></div>
+                  <div className="h-5 bg-slate-200 rounded mb-2"></div>
+                  <div className="h-3 bg-slate-100 rounded mb-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && entradas.length === 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-12 text-center">
+            <Newspaper className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+            <p className="text-amber-900 font-medium text-lg">Todavía no hay entradas publicadas.</p>
+          </div>
+        )}
+
+        {!loading && !error && entradas.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {entradas.map((e, i) => (
+              <BlogCard key={i} entrada={e} navigateTo={navigateTo} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Vista de una entrada individual del Blog
+const BlogPostView = ({ slug, navigateTo }) => {
+  const [post, setPost] = useState(null);
+  const [relacionados, setRelacionados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    if (!slug) {
+      setError('Entrada no encontrada');
+      setLoading(false);
+      return;
+    }
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-post&slug=" + encodeURIComponent(slug));
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok && data.entrada) {
+          setPost(data.entrada);
+          setRelacionados(data.relacionados || []);
+        } else {
+          setError(data.error || 'No encontramos la entrada');
+        }
+      } catch (e) {
+        setError('No pudimos cargar la entrada. Intentá refrescar.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  const url = typeof window !== 'undefined' ? window.location.origin + '/blog/' + slug : '';
+
+  const compartirWhatsApp = () => {
+    if (!post) return;
+    const texto = encodeURIComponent(post.titulo + ' — ' + url);
+    window.open('https://wa.me/?text=' + texto, '_blank');
+  };
+
+  const copiarLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch (e) { /* ignore */ }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-4 w-24 bg-slate-200 rounded mb-6"></div>
+            <div className="h-12 bg-slate-200 rounded mb-4"></div>
+            <div className="h-72 bg-slate-200 rounded-xl mb-8"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 bg-slate-100 rounded"></div>
+              <div className="h-4 w-5/6 bg-slate-100 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="py-16 bg-slate-50 min-h-screen">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Newspaper className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-serif font-bold text-slate-900 mb-4">Entrada no disponible</h1>
+          <p className="text-slate-600 mb-8">{error || 'No encontramos lo que estabas buscando.'}</p>
+          <button
+            onClick={() => navigateTo('blog')}
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-md font-medium transition-colors inline-flex items-center"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" /> Volver al Blog
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+        <button
+          onClick={() => navigateTo('blog')}
+          className="text-sm text-slate-600 hover:text-amber-600 font-medium mb-6 inline-flex items-center transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" /> Volver al Blog
+        </button>
+
+        <header className="mb-8">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="text-sm text-slate-500 flex items-center">
+              <Calendar className="h-4 w-4 mr-1" />
+              {post.fecha}
+            </span>
+            {post.tiempoLectura > 0 && (
+              <span className="text-sm text-slate-500 flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                {post.tiempoLectura} min de lectura
+              </span>
+            )}
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 leading-tight mb-4">
+            {post.titulo}
+          </h1>
+          {post.subtitulo && (
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed italic">
+              {post.subtitulo}
+            </p>
+          )}
+        </header>
+
+        {post.imagen && (
+          <div className="mb-8 rounded-xl overflow-hidden bg-slate-100 shadow-md">
+            <img
+              src={post.imagen}
+              alt={post.titulo}
+              className="w-full h-auto object-cover"
+              onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
+        {post.youtubeId && (
+          <div className="mb-10 rounded-xl overflow-hidden bg-black shadow-md">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={"https://www.youtube.com/embed/" + post.youtubeId}
+                title={post.titulo}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        )}
+
+        <div className="prose prose-slate max-w-none">
+          {renderCuerpoMarkdown(post.cuerpo)}
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-slate-200">
+          <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
+            <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
+              ¿Querés conversar sobre esto?
+            </h3>
+            <p className="text-slate-700 mb-5 leading-relaxed">
+              Escribime por WhatsApp y conversamos. Cada relato abre nuevas conversaciones.
+            </p>
+            <a
+              href={buildWhatsAppUrl('Hola Dr. López, leí su entrada del blog "' + post.titulo + '" y quería contactarlo.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
+            >
+              <WhatsAppIcon className="h-5 w-5 mr-2" />
+              Escribir por WhatsApp
+            </a>
+          </div>
+
+          <div className="mt-8 flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-semibold text-slate-700 flex items-center">
+              <Share2 className="h-4 w-4 mr-2" /> Compartir:
+            </span>
+            <button
+              onClick={compartirWhatsApp}
+              className="bg-white hover:bg-green-50 border border-green-600 text-green-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <WhatsAppIcon className="h-4 w-4 mr-2" /> WhatsApp
+            </button>
+            <button
+              onClick={copiarLink}
+              className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
+            >
+              <Copy className="h-4 w-4 mr-2" /> {copiado ? '¡Copiado!' : 'Copiar link'}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      {relacionados.length > 0 && (
+        <section className="bg-white border-t border-slate-200 py-12 mt-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8">Otras entradas del Blog</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relacionados.map((e, i) => (
+                <BlogCard key={i} entrada={e} navigateTo={navigateTo} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
+// COMPONENTES DE MEMORIAS PROFESIONALES
+// ============================================================================
+
+const MEMORIAS_CATEGORIA_COLORS = {
+  'Crisis políticas': 'bg-red-100 text-red-700 border-red-200',
+  'Casos memorables': 'bg-blue-100 text-blue-700 border-blue-200',
+  'Función pública': 'bg-violet-100 text-violet-700 border-violet-200',
+  'Sindical': 'bg-amber-100 text-amber-700 border-amber-200',
+};
+
+const MemoriaCard = ({ memoria, navigateTo, compact = false }) => {
+  const catClass = MEMORIAS_CATEGORIA_COLORS[memoria.categoria] || 'bg-slate-100 text-slate-700 border-slate-200';
+  return (
+    <article
+      onClick={() => navigateTo('memoria-post', memoria.slug)}
+      className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg hover:border-amber-300 transition-all cursor-pointer flex flex-col group"
+    >
+      {memoria.imagen && (
+        <div className={`overflow-hidden bg-slate-100 relative ${compact ? 'h-40' : 'h-48'}`}>
+          <img
+            src={memoria.imagen}
+            alt={memoria.titulo}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          {memoria.tieneVideo && (
+            <div className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center shadow-md">
+              <svg className="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Video
+            </div>
+          )}
+        </div>
+      )}
+      <div className={`p-5 flex flex-col flex-grow ${compact ? '' : 'p-6'}`}>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${catClass}`}>
+            {memoria.categoria}
+          </span>
+          <span className="text-xs text-slate-500 flex items-center">
+            <Calendar className="h-3 w-3 mr-1" />
+            {memoria.fecha}
+          </span>
+          {memoria.tiempoLectura > 0 && (
+            <span className="text-xs text-slate-500 flex items-center">
+              <Clock className="h-3 w-3 mr-1" />
+              {memoria.tiempoLectura} min
+            </span>
+          )}
+        </div>
+        <h3 className={`font-serif font-bold text-slate-900 mb-2 leading-snug group-hover:text-amber-700 transition-colors ${compact ? 'text-base' : 'text-lg'}`}>
+          {memoria.titulo}
+        </h3>
+        {!compact && memoria.subtitulo && (
+          <p className="text-sm text-slate-600 italic mb-3">{memoria.subtitulo}</p>
+        )}
+        <p className={`text-slate-600 leading-relaxed flex-grow ${compact ? 'text-xs line-clamp-3' : 'text-sm line-clamp-4'}`}>
+          {memoria.resumen}
+        </p>
+        <div className="mt-4 text-amber-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform">
+          Leer relato <ArrowRight className="h-4 w-4 ml-1" />
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const MemoriasListView = ({ navigateTo }) => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filtroCategoria, setFiltroCategoria] = useState('Todas');
+
+  useEffect(() => {
+    const fetchMemorias = async () => {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL + "?action=memorias-list");
+        if (!response.ok) throw new Error('Error de red');
+        const data = await response.json();
+        if (data.ok) {
+          setItems(data.memorias || []);
+        } else {
+          setError(data.error || 'No se pudieron cargar las memorias');
+        }
+      } catch (e) {
+        setError('No pudimos cargar las memorias. Intentá refrescar la página.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMemorias();
+  }, []);
+
+  const categorias = ['Todas', 'Crisis políticas', 'Casos memorables', 'Función pública', 'Sindical'];
+  const itemsFiltrados = filtroCategoria === 'Todas'
+    ? items
+    : items.filter(a => a.categoria === filtroCategoria);
+
+  return (
+    <div className="py-16 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-6">
+            <BookOpen className="h-8 w-8 text-amber-600" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Memorias profesionales</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Relatos en primera persona de mis 35 años de carrera: crisis, casos, lugares y personas que dejaron huella.
+          </p>
+        </div>
+
+        {!loading && items.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-center mb-10">
+            {categorias.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setFiltroCategoria(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                  filtroCategoria === cat
+                    ? 'bg-slate-900 text-white border-slate-900'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-amber-300 hover:text-amber-700'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[0, 1, 2, 3, 4, 5].map(i => (
@@ -254,22 +1103,22 @@ const BlogListView = ({ navigateTo }) => {
           </div>
         )}
 
-        {!loading && !error && articulosFiltrados.length === 0 && (
+        {!loading && !error && itemsFiltrados.length === 0 && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-12 text-center">
             <Newspaper className="h-12 w-12 text-amber-500 mx-auto mb-4" />
             <p className="text-amber-900 font-medium text-lg">
               {filtroCategoria === 'Todas'
-                ? 'Todavía no hay artículos publicados.'
-                : `No hay artículos en la categoría "${filtroCategoria}" todavía.`}
+                ? 'Todavía no hay relatos publicados.'
+                : `No hay relatos en la categoría "${filtroCategoria}" todavía.`}
             </p>
-            <p className="text-sm text-amber-700 mt-2">Pronto vamos a estar publicando novedades aquí.</p>
+            <p className="text-sm text-amber-700 mt-2">Pronto vamos a estar publicando memorias aquí.</p>
           </div>
         )}
 
-        {!loading && !error && articulosFiltrados.length > 0 && (
+        {!loading && !error && itemsFiltrados.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articulosFiltrados.map((art, i) => (
-              <BlogCard key={i} articulo={art} navigateTo={navigateTo} />
+            {itemsFiltrados.map((m, i) => (
+              <MemoriaCard key={i} memoria={m} navigateTo={navigateTo} />
             ))}
           </div>
         )}
@@ -278,8 +1127,7 @@ const BlogListView = ({ navigateTo }) => {
   );
 };
 
-// Vista de un artículo individual
-const BlogPostView = ({ slug, navigateTo }) => {
+const MemoriaPostView = ({ slug, navigateTo }) => {
   const [post, setPost] = useState(null);
   const [relacionados, setRelacionados] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -288,23 +1136,23 @@ const BlogPostView = ({ slug, navigateTo }) => {
 
   useEffect(() => {
     if (!slug) {
-      setError('Artículo no encontrado');
+      setError('Relato no encontrado');
       setLoading(false);
       return;
     }
     const fetchPost = async () => {
       try {
-        const response = await fetch(APPS_SCRIPT_URL + "?action=blog-post&slug=" + encodeURIComponent(slug));
+        const response = await fetch(APPS_SCRIPT_URL + "?action=memorias-post&slug=" + encodeURIComponent(slug));
         if (!response.ok) throw new Error('Error de red');
         const data = await response.json();
-        if (data.ok && data.articulo) {
-          setPost(data.articulo);
+        if (data.ok && data.memoria) {
+          setPost(data.memoria);
           setRelacionados(data.relacionados || []);
         } else {
-          setError(data.error || 'No encontramos el artículo');
+          setError(data.error || 'No encontramos el relato');
         }
       } catch (e) {
-        setError('No pudimos cargar el artículo. Intentá refrescar la página.');
+        setError('No pudimos cargar el relato. Intentá refrescar la página.');
       } finally {
         setLoading(false);
       }
@@ -313,7 +1161,7 @@ const BlogPostView = ({ slug, navigateTo }) => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  const url = typeof window !== 'undefined' ? window.location.origin + '/blog/' + slug : '';
+  const url = typeof window !== 'undefined' ? window.location.origin + '/memorias/' + slug : '';
 
   const compartirWhatsApp = () => {
     if (!post) return;
@@ -356,35 +1204,34 @@ const BlogPostView = ({ slug, navigateTo }) => {
       <div className="py-16 bg-slate-50 min-h-screen">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Newspaper className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-serif font-bold text-slate-900 mb-4">Artículo no disponible</h1>
+          <h1 className="text-2xl font-serif font-bold text-slate-900 mb-4">Relato no disponible</h1>
           <p className="text-slate-600 mb-8">{error || 'No encontramos lo que estabas buscando.'}</p>
           <button
-            onClick={() => navigateTo('blog')}
+            onClick={() => navigateTo('memorias')}
             className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-md font-medium transition-colors inline-flex items-center"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Volver al blog
+            <ArrowLeft className="h-4 w-4 mr-2" /> Volver a Memorias
           </button>
         </div>
       </div>
     );
   }
 
-  const catClass = CATEGORIA_COLORS[post.categoria] || CATEGORIA_COLORS['General'];
+  const catClass = MEMORIAS_CATEGORIA_COLORS[post.categoria] || 'bg-slate-100 text-slate-700 border-slate-200';
+  // Separar párrafos por línea en blanco doble (uno o más \n con espacios opcionales en el medio)
   const parrafos = post.cuerpo.split(/\n\s*\n/);
 
   return (
     <div className="bg-slate-50 min-h-screen">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
 
-        {/* Volver al blog */}
         <button
-          onClick={() => navigateTo('blog')}
+          onClick={() => navigateTo('memorias')}
           className="text-sm text-slate-600 hover:text-amber-600 font-medium mb-6 inline-flex items-center transition-colors"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" /> Volver al blog
+          <ArrowLeft className="h-4 w-4 mr-1" /> Volver a Memorias
         </button>
 
-        {/* Header del artículo */}
         <header className="mb-8">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${catClass}`}>
@@ -411,9 +1258,8 @@ const BlogPostView = ({ slug, navigateTo }) => {
           )}
         </header>
 
-        {/* Imagen destacada */}
         {post.imagen && (
-          <div className="mb-10 rounded-xl overflow-hidden bg-slate-100 shadow-md">
+          <div className="mb-8 rounded-xl overflow-hidden bg-slate-100 shadow-md">
             <img
               src={post.imagen}
               alt={post.titulo}
@@ -423,7 +1269,21 @@ const BlogPostView = ({ slug, navigateTo }) => {
           </div>
         )}
 
-        {/* Cuerpo del artículo */}
+        {post.youtubeId && (
+          <div className="mb-10 rounded-xl overflow-hidden bg-black shadow-md">
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={"https://www.youtube.com/embed/" + post.youtubeId}
+                title={post.titulo}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        )}
+
         <div className="prose prose-slate max-w-none">
           {parrafos.map((p, i) => (
             <p key={i} className="text-slate-800 text-lg leading-relaxed mb-6">
@@ -432,17 +1292,16 @@ const BlogPostView = ({ slug, navigateTo }) => {
           ))}
         </div>
 
-        {/* Compartir + CTA WhatsApp */}
         <div className="mt-12 pt-8 border-t border-slate-200">
           <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
             <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
-              ¿Tenés una consulta sobre este tema?
+              ¿Tenés un caso o situación similar?
             </h3>
             <p className="text-slate-700 mb-5 leading-relaxed">
-              Escribinos por WhatsApp y te orientamos sobre tu caso particular. La primera consulta es sin costo.
+              Si este relato te resonó con algo que estás atravesando, hablemos. Cada caso tiene su propia complejidad y vale la pena consultarlo.
             </p>
             <a
-              href={buildWhatsAppUrl('Hola Dr. López, leí su artículo "' + post.titulo + '" y quería hacerle una consulta.')}
+              href={buildWhatsAppUrl('Hola Dr. López, leí su relato "' + post.titulo + '" y quería hacerle una consulta.')}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
@@ -452,7 +1311,6 @@ const BlogPostView = ({ slug, navigateTo }) => {
             </a>
           </div>
 
-          {/* Botones compartir */}
           <div className="mt-8 flex items-center gap-3 flex-wrap">
             <span className="text-sm font-semibold text-slate-700 flex items-center">
               <Share2 className="h-4 w-4 mr-2" /> Compartir:
@@ -473,14 +1331,13 @@ const BlogPostView = ({ slug, navigateTo }) => {
         </div>
       </article>
 
-      {/* Artículos relacionados */}
       {relacionados.length > 0 && (
         <section className="bg-white border-t border-slate-200 py-12 mt-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8">Otros artículos sobre {post.categoria}</h2>
+            <h2 className="text-2xl font-serif font-bold text-slate-900 mb-8">Otros relatos sobre {post.categoria}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relacionados.map((art, i) => (
-                <BlogCard key={i} articulo={art} navigateTo={navigateTo} compact />
+              {relacionados.map((m, i) => (
+                <MemoriaCard key={i} memoria={m} navigateTo={navigateTo} compact />
               ))}
             </div>
           </div>
@@ -528,6 +1385,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
+              <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
               <a
@@ -561,6 +1419,7 @@ const App = () => {
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
               <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
               <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-3 py-2 text-base font-medium text-green-400 hover:bg-slate-700 rounded-md"><WhatsAppIcon className="h-4 w-4 mr-2" />Consultá por WhatsApp</a>
@@ -575,8 +1434,12 @@ const App = () => {
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
+        {currentView === 'novedades' && <NovedadesListView navigateTo={navigateTo} />}
+        {currentView === 'novedad-post' && <NovedadPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'blog' && <BlogListView navigateTo={navigateTo} />}
         {currentView === 'blog-post' && <BlogPostView slug={currentSlug} navigateTo={navigateTo} />}
+        {currentView === 'memorias' && <MemoriasListView navigateTo={navigateTo} />}
+        {currentView === 'memoria-post' && <MemoriaPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'portal' && <ClientPortalView />}
         {currentView === 'contact' && <ContactView />}
       </main>
@@ -598,6 +1461,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
+              <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
               <li><button onClick={() => navigateTo('portal')} className="hover:text-amber-500 transition-colors">Portal del Cliente</button></li>
               <li><button onClick={() => navigateTo('contact')} className="hover:text-amber-500 transition-colors">Formulario de consulta</button></li>
@@ -625,113 +1489,6 @@ const App = () => {
 
 /* --- VIEWS --- */
 
-const NovedadesSection = () => {
-  const [novedades, setNovedades] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    const fetchNovedades = async () => {
-      try {
-        const response = await fetch(APPS_SCRIPT_URL + "?action=novedades");
-        if (!response.ok) throw new Error("Network error");
-        const data = await response.json();
-        if (data.ok && data.novedades) {
-          setNovedades(data.novedades.slice(0, 4)); // Mostrar máximo 4
-        } else {
-          setError(true);
-        }
-      } catch (e) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNovedades();
-  }, []);
-
-  // Si no hay novedades cargadas y ya terminó de cargar, no mostrar la sección
-  if (!loading && (error || novedades.length === 0)) {
-    return null;
-  }
-
-  return (
-    <section className="py-20 bg-slate-50 border-t border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Newspaper className="h-4 w-4 mr-2" />
-            Novedades del estudio
-          </div>
-          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-3">Últimas actualizaciones</h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            Información reciente sobre cambios normativos, fallos relevantes y novedades que pueden afectar tu trámite.
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-xl border border-slate-200 p-6 animate-pulse">
-                <div className="h-3 w-24 bg-slate-200 rounded mb-4"></div>
-                <div className="h-5 bg-slate-200 rounded mb-3"></div>
-                <div className="h-5 w-3/4 bg-slate-200 rounded mb-4"></div>
-                <div className="h-3 bg-slate-100 rounded mb-2"></div>
-                <div className="h-3 bg-slate-100 rounded mb-2"></div>
-                <div className="h-3 w-2/3 bg-slate-100 rounded"></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {novedades.map((nov, i) => {
-              const catColors = {
-                'Jubilaciones': 'bg-blue-100 text-blue-700',
-                'Civil': 'bg-green-100 text-green-700',
-                'Sucesiones': 'bg-violet-100 text-violet-700',
-                'General': 'bg-slate-100 text-slate-700',
-              };
-              const catClass = catColors[nov.categoria] || catColors['General'];
-              return (
-                <article key={i} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                  <div className="flex items-center justify-between mb-3 gap-2">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${catClass}`}>
-                      {nov.categoria}
-                    </span>
-                    <span className="text-xs text-slate-500 flex items-center whitespace-nowrap">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {nov.fecha}
-                    </span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-3 leading-snug">
-                    {nov.titulo}
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed flex-grow">
-                    {nov.resumen}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="text-center mt-10">
-          <p className="text-sm text-slate-500">
-            ¿Querés consultar cómo te afecta alguna de estas novedades?{" "}
-            <a
-              href={buildWhatsAppUrl("Hola Dr. López, vi una novedad en su sitio y quería hacer una consulta.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-green-600 hover:text-green-700 font-medium inline-flex items-center"
-            >
-              Escribime por WhatsApp <ArrowRight className="h-4 w-4 ml-1" />
-            </a>
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const HomeView = ({ navigateTo }) => (
   <div>
@@ -857,8 +1614,8 @@ const HomeView = ({ navigateTo }) => (
       </div>
     </section>
 
-    {/* Sección de Novedades (lee de Google Sheets) */}
-    <NovedadesSection />
+    {/* Sección de Novedades del Derecho (lee de Google Sheets) */}
+    <NovedadesDerechoHome navigateTo={navigateTo} />
   </div>
 );
 
