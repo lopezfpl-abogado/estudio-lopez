@@ -1869,11 +1869,79 @@ const MemoriaPostView = ({ slug, navigateTo }) => {
 
 
 const App = () => {
-  const [currentView, setCurrentView] = useState('home');
-  const [currentSlug, setCurrentSlug] = useState(null);
+  // Mapeo de view → URL path para que las URLs sean amigables
+  const VIEW_TO_PATH = {
+    'home': '/',
+    'jubilaciones': '/jubilaciones',
+    'sucesiones': '/sucesiones',
+    'civil': '/civil-y-familia',
+    'empresas': '/empresas',
+    'quien-soy': '/quien-soy',
+    'novedades': '/novedades',
+    'novedad-post': '/novedades',
+    'blog': '/blog',
+    'blog-post': '/blog',
+    'memorias': '/memorias',
+    'memoria-post': '/memorias',
+    'portal': '/portal',
+  };
+
+  // Helper: dado el path actual del navegador, devuelve el view y slug correspondientes
+  const parsePathToView = (path) => {
+    if (!path || path === '/' || path === '') return { view: 'home', slug: null };
+
+    // Sacar barra inicial y final
+    const cleanPath = path.replace(/^\/+|\/+$/g, '');
+    const parts = cleanPath.split('/');
+    const first = parts[0];
+    const second = parts[1];
+
+    if (first === 'jubilaciones') return { view: 'jubilaciones', slug: null };
+    if (first === 'sucesiones') return { view: 'sucesiones', slug: null };
+    if (first === 'civil-y-familia' || first === 'civil') return { view: 'civil', slug: null };
+    if (first === 'empresas') return { view: 'empresas', slug: null };
+    if (first === 'quien-soy') return { view: 'quien-soy', slug: null };
+    if (first === 'portal') return { view: 'portal', slug: null };
+    if (first === 'novedades') {
+      return second ? { view: 'novedad-post', slug: second } : { view: 'novedades', slug: null };
+    }
+    if (first === 'blog') {
+      return second ? { view: 'blog-post', slug: second } : { view: 'blog', slug: null };
+    }
+    if (first === 'memorias') {
+      return second ? { view: 'memoria-post', slug: second } : { view: 'memorias', slug: null };
+    }
+    return { view: 'home', slug: null };
+  };
+
+  // Inicializar el estado leyendo la URL actual (importante para que funcione si alguien comparte un link)
+  const initialState = parsePathToView(typeof window !== 'undefined' ? window.location.pathname : '/');
+  const [currentView, setCurrentView] = useState(initialState.view);
+  const [currentSlug, setCurrentSlug] = useState(initialState.slug);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Escuchar el botón atrás/adelante del navegador
+  useEffect(() => {
+    const handlePopState = () => {
+      const { view, slug } = parsePathToView(window.location.pathname);
+      setCurrentView(view);
+      setCurrentSlug(slug);
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const navigateTo = (view, slug = null) => {
+    // Construir el path nuevo
+    const basePath = VIEW_TO_PATH[view] || '/';
+    const newPath = slug ? `${basePath}/${slug}` : basePath;
+
+    // Solo pushear al historial si es una URL distinta a la actual
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({ view, slug }, '', newPath);
+    }
+
     setCurrentView(view);
     setCurrentSlug(slug);
     setIsMobileMenuOpen(false);
