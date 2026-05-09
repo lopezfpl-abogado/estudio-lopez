@@ -2158,15 +2158,6 @@ const App = () => {
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('contacto')} className={`hover:text-amber-400 transition-colors ${currentView === 'contacto' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Contacto</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
-              <a
-                href={buildWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-md font-medium transition-colors flex items-center"
-              >
-                <WhatsAppIcon className="h-4 w-4 mr-2" />
-                Consultá por WhatsApp
-              </a>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -2201,7 +2192,6 @@ const App = () => {
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('contacto')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Contacto</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
-              <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-3 py-2 text-base font-medium text-green-400 hover:bg-slate-700 rounded-md"><WhatsAppIcon className="h-4 w-4 mr-2" />Consultá por WhatsApp</a>
             </div>
           </div>
         )}
