@@ -1868,6 +1868,156 @@ const MemoriaPostView = ({ slug, navigateTo }) => {
 };
 
 
+// ============================================================================
+// COMPONENTE CONTACTO (página dedicada con foco en envío por WhatsApp)
+// ============================================================================
+
+const ContactoView = () => {
+  const mensajeBase = 'Hola Dr. López, vi su sitio y quería hacerle una consulta. Le voy a adjuntar documentación relacionada.';
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6">
+            <WhatsAppIcon className="h-8 w-8 text-green-400" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Contacto</h1>
+          <p className="text-lg md:text-xl text-slate-300 leading-relaxed">
+            La forma más rápida y directa de consultarme: WhatsApp. Podés escribirme, mandar audios, fotos o cualquier documento que tengas.
+          </p>
+        </div>
+      </section>
+
+      {/* CTA principal: WhatsApp */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 md:p-12 text-center shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-4">
+              Escribime por WhatsApp
+            </h2>
+            <p className="text-slate-700 leading-relaxed mb-2 text-lg">
+              Una vez que abras el chat, podés <strong>adjuntar todos los archivos que necesites</strong>:
+            </p>
+            <p className="text-slate-600 mb-8 text-base">
+              documentos en Word o PDF, planillas Excel, fotos del DNI, recibos, cartas documento, notas de voz, capturas de pantalla, lo que sea.
+            </p>
+            <a
+              href={buildWhatsAppUrl(mensajeBase)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+            >
+              <WhatsAppIcon className="h-6 w-6 mr-3" />
+              Abrir conversación por WhatsApp
+            </a>
+            <p className="text-sm text-slate-500 mt-6">+54 9 221 618-0192</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Cómo enviar archivos: tutorial visual */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3">
+              Cómo enviarme archivos
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              Cuatro pasos simples para que recibas asesoramiento con todo el contexto de tu situación.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { num: '1', titulo: 'Tocá el botón', desc: 'Hacé clic en el botón verde de WhatsApp arriba.' },
+              { num: '2', titulo: 'Se abre WhatsApp', desc: 'Tu app de WhatsApp se abre con el chat ya iniciado.' },
+              { num: '3', titulo: 'Escribí tu consulta', desc: 'Contame brevemente qué necesitás resolver.' },
+              { num: '4', titulo: 'Adjuntá archivos', desc: 'Tocá el clip 📎 de WhatsApp y mandá los documentos.' },
+            ].map((paso, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg mb-4">
+                  {paso.num}
+                </div>
+                <h3 className="font-serif font-bold text-slate-900 mb-2">{paso.titulo}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{paso.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <h3 className="text-lg font-serif font-bold text-slate-900 mb-4 flex items-center">
+              <FileText className="h-5 w-5 text-amber-600 mr-2" />
+              Qué tipo de archivos podés enviar
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-slate-700">
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> PDF</div>
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> Word (.doc, .docx)</div>
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> Excel (.xls, .xlsx)</div>
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> Fotos (DNI, recibos)</div>
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> Notas de voz</div>
+              <div className="flex items-center"><CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" /> Capturas de pantalla</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Privacidad y horario */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+              <div className="flex items-start">
+                <Shield className="h-6 w-6 text-amber-600 mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-serif font-bold text-slate-900 mb-2">Tus mensajes son privados</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Toda la conversación queda en tu chat directo conmigo. Podés mandar documentación personal o sensible con tranquilidad: nadie más accede al contenido.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+              <div className="flex items-start">
+                <Clock className="h-6 w-6 text-amber-600 mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-serif font-bold text-slate-900 mb-2">Horario de atención</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    Respondo en horario hábil: <strong>lunes a viernes, 9 a 18hs</strong>. Si me escribís fuera de horario, te contesto al día siguiente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Otros canales */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-xl font-serif font-bold text-slate-900 mb-2">¿Preferís otro canal?</h2>
+          <p className="text-slate-600 mb-6">También podés escribirme por email o llamarme:</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="mailto:lopezf.pl@gmail.com" className="inline-flex items-center justify-center bg-white border-2 border-slate-300 hover:border-amber-400 text-slate-700 px-6 py-3 rounded-md font-medium transition-colors">
+              <Mail className="h-5 w-5 mr-2" />
+              lopezf.pl@gmail.com
+            </a>
+            <a href="tel:+5492216180192" className="inline-flex items-center justify-center bg-white border-2 border-slate-300 hover:border-amber-400 text-slate-700 px-6 py-3 rounded-md font-medium transition-colors">
+              <MessageCircle className="h-5 w-5 mr-2" />
+              +54 9 221 618-0192
+            </a>
+          </div>
+          <p className="text-sm text-slate-500 mt-6">
+            Punta Lara, Ensenada, Provincia de Buenos Aires
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+
 const App = () => {
   // Mapeo de view → URL path para que las URLs sean amigables
   const VIEW_TO_PATH = {
@@ -1884,6 +2034,7 @@ const App = () => {
     'memorias': '/memorias',
     'memoria-post': '/memorias',
     'portal': '/portal',
+    'contacto': '/contacto',
   };
 
   // Helper: dado el path actual del navegador, devuelve el view y slug correspondientes
@@ -1902,6 +2053,7 @@ const App = () => {
     if (first === 'empresas') return { view: 'empresas', slug: null };
     if (first === 'quien-soy') return { view: 'quien-soy', slug: null };
     if (first === 'portal') return { view: 'portal', slug: null };
+    if (first === 'contacto') return { view: 'contacto', slug: null };
     if (first === 'novedades') {
       return second ? { view: 'novedad-post', slug: second } : { view: 'novedades', slug: null };
     }
@@ -1968,15 +2120,43 @@ const App = () => {
             </div>
 
             {/* Desktop Menu */}
-            <nav className="hidden md:flex space-x-8 items-center">
+            <nav className="hidden md:flex space-x-7 items-center">
               <button onClick={() => navigateTo('home')} className={`hover:text-amber-400 transition-colors ${currentView === 'home' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Inicio</button>
-              <button onClick={() => navigateTo('jubilaciones')} className={`hover:text-amber-400 transition-colors ${currentView === 'jubilaciones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Jubilaciones</button>
-              <button onClick={() => navigateTo('sucesiones')} className={`hover:text-amber-400 transition-colors ${currentView === 'sucesiones' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Sucesiones</button>
-              <button onClick={() => navigateTo('civil')} className={`hover:text-amber-400 transition-colors ${currentView === 'civil' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Civil y Familia</button>
-              <button onClick={() => navigateTo('empresas')} className={`hover:text-amber-400 transition-colors ${currentView === 'empresas' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Asesoramiento Empresarial</button>
+
+              {/* Dropdown Servicios */}
+              <div className="relative group">
+                <button className={`hover:text-amber-400 transition-colors flex items-center ${['jubilaciones','sucesiones','civil','empresas'].includes(currentView) ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>
+                  Servicios
+                  <svg className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {/* Submenú */}
+                <div className="absolute left-0 top-full pt-3 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
+                  <div className="bg-white rounded-lg shadow-xl border border-slate-200 py-2 min-w-[260px]">
+                    <button onClick={() => navigateTo('jubilaciones')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'jubilaciones' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
+                      <Clock className="h-4 w-4 mr-3 text-amber-600" />
+                      Jubilaciones
+                    </button>
+                    <button onClick={() => navigateTo('sucesiones')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'sucesiones' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
+                      <FileText className="h-4 w-4 mr-3 text-amber-600" />
+                      Sucesiones
+                    </button>
+                    <button onClick={() => navigateTo('civil')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'civil' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
+                      <Users className="h-4 w-4 mr-3 text-amber-600" />
+                      Civil y Familia
+                    </button>
+                    <div className="border-t border-slate-100 my-1"></div>
+                    <button onClick={() => navigateTo('empresas')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'empresas' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
+                      <Briefcase className="h-4 w-4 mr-3 text-amber-600" />
+                      Asesoramiento Empresarial
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <button onClick={() => navigateTo('quien-soy')} className={`hover:text-amber-400 transition-colors ${currentView === 'quien-soy' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
+              <button onClick={() => navigateTo('contacto')} className={`hover:text-amber-400 transition-colors ${currentView === 'contacto' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Contacto</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
               <a
                 href={buildWhatsAppUrl()}
@@ -2006,13 +2186,20 @@ const App = () => {
           <div className="md:hidden bg-slate-800 border-t border-slate-700">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <button onClick={() => navigateTo('home')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Inicio</button>
-              <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
-              <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
-              <button onClick={() => navigateTo('civil')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
-              <button onClick={() => navigateTo('empresas')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Asesoramiento Empresarial</button>
+
+              {/* Grupo Servicios */}
+              <div className="px-3 pt-3 pb-1 text-xs font-bold text-amber-500 uppercase tracking-wider">Servicios</div>
+              <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
+              <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
+              <button onClick={() => navigateTo('civil')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              <button onClick={() => navigateTo('empresas')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Asesoramiento Empresarial</button>
+
+              {/* Resto del menú */}
+              <div className="border-t border-slate-700 my-2"></div>
               <button onClick={() => navigateTo('quien-soy')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Quién soy</button>
               <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
+              <button onClick={() => navigateTo('contacto')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Contacto</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
               <a href={buildWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-3 py-2 text-base font-medium text-green-400 hover:bg-slate-700 rounded-md"><WhatsAppIcon className="h-4 w-4 mr-2" />Consultá por WhatsApp</a>
             </div>
@@ -2034,6 +2221,7 @@ const App = () => {
         {currentView === 'blog-post' && <BlogPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'memorias' && <MemoriasListView navigateTo={navigateTo} />}
         {currentView === 'memoria-post' && <MemoriaPostView slug={currentSlug} navigateTo={navigateTo} />}
+        {currentView === 'contacto' && <ContactoView />}
         {currentView === 'portal' && <ClientPortalView />}
         {currentView === 'contact' && <ContactView />}
       </main>
@@ -2059,8 +2247,8 @@ const App = () => {
               <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
+              <li><button onClick={() => navigateTo('contacto')} className="hover:text-amber-500 transition-colors">Contacto</button></li>
               <li><button onClick={() => navigateTo('portal')} className="hover:text-amber-500 transition-colors">Portal del Cliente</button></li>
-              <li><button onClick={() => navigateTo('contact')} className="hover:text-amber-500 transition-colors">Formulario de consulta</button></li>
             </ul>
           </div>
           <div>
