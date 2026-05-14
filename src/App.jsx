@@ -635,6 +635,17 @@ const NOVEDADES_CATEGORIA_COLORS = {
   'General': 'bg-slate-100 text-slate-700 border-slate-200',
 };
 
+// Helper: mapeo de categoría de Novedad → servicio relacionado del sitio
+const getServicioRelacionado = (categoria) => {
+  const mapa = {
+    'Familia': { ruta: 'civil', titulo: 'Derecho Civil y Familia', descripcion: 'Divorcios, alimentos, régimen de comunicación, contratos y más.' },
+    'Civil': { ruta: 'civil', titulo: 'Derecho Civil y Familia', descripcion: 'Daños y perjuicios, contratos, desalojos, amparos.' },
+    'Sucesiones': { ruta: 'sucesiones', titulo: 'Sucesiones', descripcion: 'Trámites sucesorios completos, judiciales y extrajudiciales.' },
+    'Laboral': { ruta: 'jubilaciones', titulo: 'Jubilaciones y Pensiones', descripcion: 'Trámites previsionales, reajustes de haberes y reclamos ante ANSES.' },
+  };
+  return mapa[categoria] || null;
+};
+
 // Renderiza el cuerpo Markdown-light: ## subtítulos, **negritas**, - listas, "citas" (Autor)
 const renderCuerpoMarkdown = (cuerpo) => {
   if (!cuerpo) return [];
@@ -1076,23 +1087,71 @@ const NovedadPostView = ({ slug, navigateTo }) => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-200">
-          <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
-            <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
-              ¿Tenés dudas sobre cómo te afecta esto?
-            </h3>
-            <p className="text-slate-700 mb-5 leading-relaxed">
-              Cada situación es particular. Escribime por WhatsApp y vemos juntos cómo aplica este cambio normativo a tu caso concreto.
-            </p>
-            <a
-              href={buildWhatsAppUrl('Hola Dr. López, leí su artículo "' + post.titulo + '" y quería hacerle una consulta.')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
-            >
-              <WhatsAppIcon className="h-5 w-5 mr-2" />
-              Consultar por WhatsApp
-            </a>
-          </div>
+          {(() => {
+            const servicio = getServicioRelacionado(post.categoria);
+            return (
+              <div className="bg-slate-50 rounded-xl p-6 md:p-8 border border-slate-200">
+                <div className={`grid gap-6 ${servicio ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+                  {/* Columna 1: Sobre el autor */}
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 mb-4 text-xs font-bold text-amber-700 uppercase tracking-wider">
+                      <Users className="h-4 w-4" /> Sobre el autor
+                    </div>
+                    <div className="flex items-start gap-4 mb-4">
+                      <img
+                        src={profilePhoto}
+                        alt="Juan Fernando López"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-amber-400 flex-shrink-0"
+                      />
+                      <div>
+                        <h4 className="font-serif font-bold text-slate-900 leading-tight">Juan Fernando López</h4>
+                        <p className="text-sm text-slate-600 mt-0.5">Abogado UNLP · 35+ años de trayectoria</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigateTo('quien-soy')}
+                      className="text-amber-700 hover:text-amber-800 font-medium text-sm inline-flex items-center transition-colors mt-auto self-start"
+                    >
+                      Conocer mi trayectoria <ArrowRight className="h-4 w-4 ml-1" />
+                    </button>
+                  </div>
+
+                  {/* Columna 2: Servicio relacionado (solo si hay match) */}
+                  {servicio && (
+                    <div className="flex flex-col md:border-l md:border-slate-200 md:pl-6">
+                      <div className="flex items-center gap-2 mb-4 text-xs font-bold text-amber-700 uppercase tracking-wider">
+                        <Scale className="h-4 w-4" /> Servicio relacionado
+                      </div>
+                      <h4 className="font-serif font-bold text-slate-900 leading-tight mb-1">{servicio.titulo}</h4>
+                      <p className="text-sm text-slate-600 mb-4">{servicio.descripcion}</p>
+                      <button
+                        onClick={() => navigateTo(servicio.ruta)}
+                        className="text-amber-700 hover:text-amber-800 font-medium text-sm inline-flex items-center transition-colors mt-auto self-start"
+                      >
+                        Ver el servicio <ArrowRight className="h-4 w-4 ml-1" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* WhatsApp como link secundario al pie */}
+                <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+                  <p className="text-sm text-slate-600">
+                    ¿Querés consultar tu caso concreto?{" "}
+                    <a
+                      href={buildWhatsAppUrl('Hola Dr. López, leí su artículo "' + post.titulo + '" y quería hacerle una consulta.')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:text-green-700 font-medium inline-flex items-center"
+                    >
+                      <WhatsAppIcon className="h-4 w-4 ml-1 mr-1" />
+                      Escribime por WhatsApp
+                    </a>
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="mt-8 flex items-center gap-3 flex-wrap">
             <span className="text-sm font-semibold text-slate-700 flex items-center">
@@ -1417,22 +1476,63 @@ const BlogPostView = ({ slug, navigateTo }) => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-200">
-          <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-6 md:p-8 border border-green-200">
-            <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">
-              ¿Querés conversar sobre esto?
-            </h3>
-            <p className="text-slate-700 mb-5 leading-relaxed">
-              Escribime por WhatsApp y conversamos. Cada relato abre nuevas conversaciones.
-            </p>
-            <a
-              href={buildWhatsAppUrl('Hola Dr. López, leí su entrada del blog "' + post.titulo + '" y quería contactarlo.')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
-            >
-              <WhatsAppIcon className="h-5 w-5 mr-2" />
-              Escribir por WhatsApp
-            </a>
+          <div className="bg-slate-50 rounded-xl p-6 md:p-8 border border-slate-200">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Columna 1: Sobre el autor */}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-4 text-xs font-bold text-amber-700 uppercase tracking-wider">
+                  <Users className="h-4 w-4" /> Sobre el autor
+                </div>
+                <div className="flex items-start gap-4 mb-4">
+                  <img
+                    src={profilePhoto}
+                    alt="Juan Fernando López"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-amber-400 flex-shrink-0"
+                  />
+                  <div>
+                    <h4 className="font-serif font-bold text-slate-900 leading-tight">Juan Fernando López</h4>
+                    <p className="text-sm text-slate-600 mt-0.5">Abogado UNLP · 35+ años de trayectoria</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigateTo('quien-soy')}
+                  className="text-amber-700 hover:text-amber-800 font-medium text-sm inline-flex items-center transition-colors mt-auto self-start"
+                >
+                  Conocer mi trayectoria <ArrowRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+
+              {/* Columna 2: Más relatos */}
+              <div className="flex flex-col md:border-l md:border-slate-200 md:pl-6">
+                <div className="flex items-center gap-2 mb-4 text-xs font-bold text-amber-700 uppercase tracking-wider">
+                  <BookOpen className="h-4 w-4" /> Más relatos
+                </div>
+                <h4 className="font-serif font-bold text-slate-900 leading-tight mb-1">Otras crónicas del estudio</h4>
+                <p className="text-sm text-slate-600 mb-4">Recuerdos y reflexiones de 35 años de profesión: casos memorables, función pública, crisis y aprendizajes.</p>
+                <button
+                  onClick={() => navigateTo('blog')}
+                  className="text-amber-700 hover:text-amber-800 font-medium text-sm inline-flex items-center transition-colors mt-auto self-start"
+                >
+                  Ver todos los relatos <ArrowRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+
+            {/* WhatsApp como link secundario al pie */}
+            <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+              <p className="text-sm text-slate-600">
+                ¿Necesitás asesoramiento?{" "}
+                <a
+                  href={buildWhatsAppUrl('Hola Dr. López, leí su entrada del blog "' + post.titulo + '" y quería contactarlo.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-600 hover:text-green-700 font-medium inline-flex items-center"
+                >
+                  <WhatsAppIcon className="h-4 w-4 ml-1 mr-1" />
+                  Escribime por WhatsApp
+                </a>
+              </p>
+            </div>
           </div>
 
           <div className="mt-8 flex items-center gap-3 flex-wrap">
