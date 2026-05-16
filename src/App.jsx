@@ -2146,6 +2146,16 @@ const TeamView = () => {
   const [editError, setEditError] = useState('');
   const [savedFeedback, setSavedFeedback] = useState(false);
 
+  // Estados para alta de cliente nuevo
+  const [showNewClienteModal, setShowNewClienteModal] = useState(false);
+  const [newClienteForm, setNewClienteForm] = useState({
+    clienteDni: '', clienteNombre: '', clienteEmail: '', clienteTelefono: '', clientePassword: '',
+    casoId: '', casoArea: '', casoTitulo: '', casoOrganismo: '', casoEstado: 'En trámite', casoProgreso: 0, casoProximoPaso: '',
+  });
+  const [isSavingNewCliente, setIsSavingNewCliente] = useState(false);
+  const [newClienteError, setNewClienteError] = useState('');
+  const [newClienteSaved, setNewClienteSaved] = useState(false);
+
   // Auto-login al cargar la página si hay credenciales guardadas en localStorage
   useEffect(() => {
     const checkSession = async () => {
@@ -2336,6 +2346,98 @@ const TeamView = () => {
     }
   };
 
+  // ============================== ALTA DE CLIENTE NUEVO ==============================
+  const openNewClienteModal = () => {
+    setNewClienteForm({
+      clienteDni: '', clienteNombre: '', clienteEmail: '', clienteTelefono: '', clientePassword: '',
+      casoId: '', casoArea: '', casoTitulo: '', casoOrganismo: '', casoEstado: 'En trámite', casoProgreso: 0, casoProximoPaso: '',
+    });
+    setNewClienteError('');
+    setNewClienteSaved(false);
+    setShowNewClienteModal(true);
+  };
+
+  const closeNewClienteModal = () => {
+    setShowNewClienteModal(false);
+    setNewClienteError('');
+    setNewClienteSaved(false);
+  };
+
+  const handleSaveNewCliente = async () => {
+    // Validaciones mínimas
+    if (!newClienteForm.clienteDni.trim()) {
+      setNewClienteError('El DNI es obligatorio.');
+      return;
+    }
+    if (!newClienteForm.clienteNombre.trim()) {
+      setNewClienteError('El nombre completo es obligatorio.');
+      return;
+    }
+    if (!newClienteForm.clientePassword.trim()) {
+      setNewClienteError('La contraseña es obligatoria (es la que va a usar el cliente para entrar al portal).');
+      return;
+    }
+    // Si se llenó casoId, el título es obligatorio
+    if (newClienteForm.casoId.trim() && !newClienteForm.casoTitulo.trim()) {
+      setNewClienteError('Si querés cargar un caso, el título es obligatorio. O dejá vacío el ID del caso.');
+      return;
+    }
+
+    let progresoVal = parseInt(newClienteForm.casoProgreso);
+    if (isNaN(progresoVal)) progresoVal = 0;
+    if (progresoVal < 0) progresoVal = 0;
+    if (progresoVal > 100) progresoVal = 100;
+
+    setIsSavingNewCliente(true);
+    setNewClienteError('');
+    try {
+      const saved = JSON.parse(localStorage.getItem(TEAM_SESSION_KEY) || '{}');
+      if (!saved.dni || !saved.password) {
+        setNewClienteError('Sesión expirada. Volvé a iniciar sesión.');
+        setIsSavingNewCliente(false);
+        return;
+      }
+      const params = new URLSearchParams({
+        action: 'add-cliente',
+        dni: saved.dni,
+        password: saved.password,
+        clienteDni: newClienteForm.clienteDni.trim(),
+        clienteNombre: newClienteForm.clienteNombre.trim(),
+        clienteEmail: newClienteForm.clienteEmail.trim(),
+        clienteTelefono: newClienteForm.clienteTelefono.trim(),
+        clientePassword: newClienteForm.clientePassword.trim(),
+        casoId: newClienteForm.casoId.trim(),
+        casoArea: newClienteForm.casoArea.trim(),
+        casoTitulo: newClienteForm.casoTitulo.trim(),
+        casoOrganismo: newClienteForm.casoOrganismo.trim(),
+        casoEstado: newClienteForm.casoEstado.trim(),
+        casoProgreso: String(progresoVal),
+        casoProximoPaso: newClienteForm.casoProximoPaso.trim(),
+      });
+      const url = APPS_SCRIPT_URL + '?' + params.toString();
+      const response = await fetch(url, { method: 'GET' });
+      if (!response.ok) {
+        setNewClienteError('No pudimos conectar con el servidor. Probá de nuevo.');
+        setIsSavingNewCliente(false);
+        return;
+      }
+      const data = await response.json();
+      if (data.ok) {
+        setNewClienteSaved(true);
+        // Refrescar el listado en segundo plano
+        loadClientes(saved.dni, saved.password);
+        // Cerrar el modal después de un breve delay
+        setTimeout(() => { closeNewClienteModal(); }, 1500);
+      } else {
+        setNewClienteError(data.error || 'No se pudo crear el cliente.');
+      }
+    } catch (e) {
+      setNewClienteError('Error de conexión al guardar. Verificá tu internet.');
+    } finally {
+      setIsSavingNewCliente(false);
+    }
+  };
+
   // Pantalla de carga inicial mientras verificamos sesión guardada
   if (autoLoginChecking) {
     return (
@@ -2449,12 +2551,21 @@ const TeamView = () => {
             </h1>
             <p className="text-slate-600 text-sm mt-1">Gestión de clientes y casos del estudio</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-sm"
-          >
-            Cerrar sesión
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={openNewClienteModal}
+              className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-sm inline-flex items-center"
+            >
+              <Users className="h-4 w-4 mr-1.5" />
+              Nuevo cliente
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-sm"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -2792,6 +2903,257 @@ const TeamView = () => {
                     )}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ALTA DE CLIENTE NUEVO */}
+      {showNewClienteModal && (
+        <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
+
+            {/* Header del modal */}
+            <div className="sticky top-0 bg-slate-900 text-white p-5 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Alta de cliente</span>
+                </div>
+                <h3 className="text-lg font-serif font-bold">Nuevo cliente</h3>
+              </div>
+              <button
+                onClick={closeNewClienteModal}
+                disabled={isSavingNewCliente}
+                className="text-slate-300 hover:text-white p-1 rounded-md hover:bg-slate-800 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Cuerpo del modal */}
+            <div className="p-6 space-y-5">
+
+              {newClienteSaved && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center text-green-800">
+                  <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span className="text-sm font-medium">Cliente creado correctamente.</span>
+                </div>
+              )}
+
+              {/* SECCIÓN 1: Datos del cliente */}
+              <div>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Datos del cliente</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      DNI <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newClienteForm.clienteDni}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, clienteDni: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="Sin puntos ni espacios"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Nombre completo <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newClienteForm.clienteNombre}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, clienteNombre: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="Apellido, Nombre"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={newClienteForm.clienteEmail}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, clienteEmail: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="cliente@ejemplo.com"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                    <input
+                      type="text"
+                      value={newClienteForm.clienteTelefono}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, clienteTelefono: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="+54 9 221 ..."
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Contraseña del portal <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newClienteForm.clientePassword}
+                    onChange={(e) => setNewClienteForm({ ...newClienteForm, clientePassword: e.target.value })}
+                    disabled={isSavingNewCliente}
+                    placeholder="La que vas a entregarle al cliente"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Esta es la contraseña que el cliente va a usar para entrar al Portal del Cliente. Anotala para entregársela.
+                  </p>
+                </div>
+              </div>
+
+              {/* SECCIÓN 2: Primer caso (opcional) */}
+              <div className="border-t border-slate-200 pt-5">
+                <div className="mb-3">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Primer caso (opcional)</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Si ya tenés definido un caso para este cliente, completá los datos. Si no, dejá el ID del caso vacío y agregalo más tarde.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">ID del caso</label>
+                  <input
+                    type="text"
+                    value={newClienteForm.casoId}
+                    onChange={(e) => setNewClienteForm({ ...newClienteForm, casoId: e.target.value })}
+                    disabled={isSavingNewCliente}
+                    placeholder="Ej: JUB-2026-0156"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Formato sugerido: ÁREA-AÑO-NÚMERO (ej: JUB-2026-0156, SUC-2026-0042, CIV-2026-0023).
+                  </p>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Título del caso</label>
+                  <input
+                    type="text"
+                    value={newClienteForm.casoTitulo}
+                    onChange={(e) => setNewClienteForm({ ...newClienteForm, casoTitulo: e.target.value })}
+                    disabled={isSavingNewCliente}
+                    placeholder="Ej: Jubilación ordinaria"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Área</label>
+                    <input
+                      type="text"
+                      value={newClienteForm.casoArea}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, casoArea: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="Ej: Jubilaciones"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Organismo</label>
+                    <input
+                      type="text"
+                      value={newClienteForm.casoOrganismo}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, casoOrganismo: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="Ej: ANSES"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Estado inicial</label>
+                    <input
+                      type="text"
+                      value={newClienteForm.casoEstado}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, casoEstado: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      placeholder="Ej: En trámite"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      Progreso inicial <span className="text-slate-400 text-xs">(0-100)</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={newClienteForm.casoProgreso}
+                      onChange={(e) => setNewClienteForm({ ...newClienteForm, casoProgreso: e.target.value })}
+                      disabled={isSavingNewCliente}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Próximo paso</label>
+                  <textarea
+                    value={newClienteForm.casoProximoPaso}
+                    onChange={(e) => setNewClienteForm({ ...newClienteForm, casoProximoPaso: e.target.value })}
+                    disabled={isSavingNewCliente}
+                    rows="2"
+                    placeholder="Ej: Reunir documentación de aportes"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60 resize-none"
+                  />
+                </div>
+              </div>
+
+              {newClienteError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700">
+                  {newClienteError}
+                </div>
+              )}
+
+              <div className="bg-slate-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl border-t border-slate-200 flex flex-col sm:flex-row sm:justify-end gap-2">
+                <button
+                  onClick={closeNewClienteModal}
+                  disabled={isSavingNewCliente}
+                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveNewCliente}
+                  disabled={isSavingNewCliente || newClienteSaved}
+                  className="px-5 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:bg-slate-400 rounded-md transition-colors inline-flex items-center justify-center min-w-[140px]"
+                >
+                  {isSavingNewCliente ? (
+                    <>
+                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                      Creando...
+                    </>
+                  ) : newClienteSaved ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Creado
+                    </>
+                  ) : (
+                    'Crear cliente'
+                  )}
+                </button>
               </div>
             </div>
           </div>
