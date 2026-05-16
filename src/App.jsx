@@ -2136,6 +2136,16 @@ const TeamView = () => {
   const [isLoadingClientes, setIsLoadingClientes] = useState(false);
   const [autoLoginChecking, setAutoLoginChecking] = useState(true);
 
+  // Estados para edición de caso
+  const [editingCaso, setEditingCaso] = useState(null);
+  const [editClienteName, setEditClienteName] = useState('');
+  const [editForm, setEditForm] = useState({
+    area: '', titulo: '', organismo: '', estado: '', progreso: 0, proximoPaso: '',
+  });
+  const [isSavingCaso, setIsSavingCaso] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [savedFeedback, setSavedFeedback] = useState(false);
+
   // Auto-login al cargar la página si hay credenciales guardadas en localStorage
   useEffect(() => {
     const checkSession = async () => {
@@ -2243,6 +2253,87 @@ const TeamView = () => {
     setPassword('');
     setError('');
     setSearchTerm('');
+  };
+
+  // ============================== EDICIÓN DE CASOS ==============================
+  const openEditModal = (caso, clienteName) => {
+    setEditingCaso(caso);
+    setEditClienteName(clienteName || '');
+    setEditForm({
+      area: caso.area || '',
+      titulo: caso.titulo || '',
+      organismo: caso.organismo || '',
+      estado: caso.estado || '',
+      progreso: caso.progreso || 0,
+      proximoPaso: caso.proximoPaso || '',
+    });
+    setEditError('');
+    setSavedFeedback(false);
+  };
+
+  const closeEditModal = () => {
+    setEditingCaso(null);
+    setEditClienteName('');
+    setEditForm({ area: '', titulo: '', organismo: '', estado: '', progreso: 0, proximoPaso: '' });
+    setEditError('');
+    setSavedFeedback(false);
+  };
+
+  const handleSaveCaso = async () => {
+    if (!editingCaso) return;
+    // Validación mínima: título obligatorio
+    if (!editForm.titulo.trim()) {
+      setEditError('El título del caso es obligatorio.');
+      return;
+    }
+    let progresoVal = parseInt(editForm.progreso);
+    if (isNaN(progresoVal)) progresoVal = 0;
+    if (progresoVal < 0) progresoVal = 0;
+    if (progresoVal > 100) progresoVal = 100;
+
+    setIsSavingCaso(true);
+    setEditError('');
+    try {
+      const saved = JSON.parse(localStorage.getItem(TEAM_SESSION_KEY) || '{}');
+      if (!saved.dni || !saved.password) {
+        setEditError('Sesión expirada. Volvé a iniciar sesión.');
+        setIsSavingCaso(false);
+        return;
+      }
+      const params = new URLSearchParams({
+        action: 'update-caso',
+        dni: saved.dni,
+        password: saved.password,
+        casoId: editingCaso.id,
+        area: editForm.area || '',
+        titulo: editForm.titulo || '',
+        organismo: editForm.organismo || '',
+        estado: editForm.estado || '',
+        progreso: String(progresoVal),
+        proximoPaso: editForm.proximoPaso || '',
+      });
+      const url = APPS_SCRIPT_URL + '?' + params.toString();
+      const response = await fetch(url, { method: 'GET' });
+      if (!response.ok) {
+        setEditError('No pudimos conectar con el servidor. Probá de nuevo.');
+        setIsSavingCaso(false);
+        return;
+      }
+      const data = await response.json();
+      if (data.ok) {
+        setSavedFeedback(true);
+        // Refrescar el listado en segundo plano
+        loadClientes(saved.dni, saved.password);
+        // Cerrar el modal después de un breve delay para mostrar el "guardado"
+        setTimeout(() => { closeEditModal(); }, 1200);
+      } else {
+        setEditError(data.error || 'No se pudo guardar el caso.');
+      }
+    } catch (e) {
+      setEditError('Error de conexión al guardar. Verificá tu internet.');
+    } finally {
+      setIsSavingCaso(false);
+    }
   };
 
   // Pantalla de carga inicial mientras verificamos sesión guardada
@@ -2504,6 +2595,13 @@ const TeamView = () => {
                                 <div className="bg-amber-500 h-1.5 rounded-full transition-all" style={{ width: caso.progreso + "%" }}></div>
                               </div>
                             </div>
+                            <button
+                              onClick={() => openEditModal(caso, c.nombre)}
+                              className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-md transition-colors inline-flex items-center justify-center"
+                            >
+                              <FileText className="h-3 w-3 mr-1.5" />
+                              Editar caso
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -2525,6 +2623,180 @@ const TeamView = () => {
           Panel interno · Información confidencial sujeta a secreto profesional
         </div>
       </div>
+
+      {/* MODAL DE EDICIÓN DE CASO */}
+      {editingCaso && (
+        <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
+
+            {/* Header del modal */}
+            <div className="sticky top-0 bg-slate-900 text-white p-5 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono bg-amber-500 text-slate-900 px-2 py-0.5 rounded font-bold">{editingCaso.id}</span>
+                  {editClienteName && <span className="text-xs text-slate-300">· Cliente: {editClienteName}</span>}
+                </div>
+                <h3 className="text-lg font-serif font-bold">Editar caso</h3>
+              </div>
+              <button
+                onClick={closeEditModal}
+                disabled={isSavingCaso}
+                className="text-slate-300 hover:text-white p-1 rounded-md hover:bg-slate-800 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Cuerpo del modal */}
+            <div className="p-6 space-y-5">
+
+              {savedFeedback && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center text-green-800">
+                  <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span className="text-sm font-medium">Caso guardado correctamente.</span>
+                </div>
+              )}
+
+              {/* Estado y Progreso (los más importantes, arriba) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+                  <input
+                    type="text"
+                    value={editForm.estado}
+                    onChange={(e) => setEditForm({ ...editForm, estado: e.target.value })}
+                    disabled={isSavingCaso}
+                    placeholder="Ej: En trámite"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Progreso <span className="text-slate-400 text-xs">(0 a 100)</span>
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={editForm.progreso}
+                      onChange={(e) => setEditForm({ ...editForm, progreso: e.target.value })}
+                      disabled={isSavingCaso}
+                      className="w-24 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                    <div className="flex-1 bg-slate-200 rounded-full h-2">
+                      <div
+                        className="bg-amber-500 h-2 rounded-full transition-all"
+                        style={{ width: Math.max(0, Math.min(100, parseInt(editForm.progreso) || 0)) + "%" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Próximo paso */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Próximo paso</label>
+                <textarea
+                  value={editForm.proximoPaso}
+                  onChange={(e) => setEditForm({ ...editForm, proximoPaso: e.target.value })}
+                  disabled={isSavingCaso}
+                  rows="2"
+                  placeholder="Ej: Esperando vista de la causa en ANSES"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60 resize-none"
+                />
+              </div>
+
+              <div className="border-t border-slate-200 pt-5">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Datos generales del caso</p>
+
+                {/* Título */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Título <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.titulo}
+                    onChange={(e) => setEditForm({ ...editForm, titulo: e.target.value })}
+                    disabled={isSavingCaso}
+                    placeholder="Ej: Jubilación ordinaria"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                  />
+                </div>
+
+                {/* Área y Organismo */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Área</label>
+                    <input
+                      type="text"
+                      value={editForm.area}
+                      onChange={(e) => setEditForm({ ...editForm, area: e.target.value })}
+                      disabled={isSavingCaso}
+                      placeholder="Ej: Jubilaciones"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Organismo</label>
+                    <input
+                      type="text"
+                      value={editForm.organismo}
+                      onChange={(e) => setEditForm({ ...editForm, organismo: e.target.value })}
+                      disabled={isSavingCaso}
+                      placeholder="Ej: ANSES"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {editError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700">
+                  {editError}
+                </div>
+              )}
+
+              <div className="bg-slate-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl border-t border-slate-200 flex flex-col sm:flex-row sm:justify-between gap-3">
+                <p className="text-xs text-slate-500 flex items-center">
+                  <Clock className="h-3 w-3 mr-1.5" />
+                  La fecha de última actualización se establece automáticamente al guardar.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={closeEditModal}
+                    disabled={isSavingCaso}
+                    className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors disabled:opacity-60"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveCaso}
+                    disabled={isSavingCaso || savedFeedback}
+                    className="px-5 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:bg-slate-400 rounded-md transition-colors inline-flex items-center justify-center min-w-[120px]"
+                  >
+                    {isSavingCaso ? (
+                      <>
+                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                        Guardando...
+                      </>
+                    ) : savedFeedback ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Guardado
+                      </>
+                    ) : (
+                      'Guardar cambios'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
