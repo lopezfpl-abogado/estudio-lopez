@@ -2118,6 +2118,418 @@ const ContactoView = () => {
 };
 
 
+// ============================================================================
+// PANEL DEL EQUIPO (admin) — URL oculta /equipo
+// ============================================================================
+
+const TEAM_SESSION_KEY = 'estudio_lopez_team_session';
+
+const TeamView = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [admin, setAdmin] = useState(null);
+  const [clientes, setClientes] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dni, setDni] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingClientes, setIsLoadingClientes] = useState(false);
+  const [autoLoginChecking, setAutoLoginChecking] = useState(true);
+
+  // Auto-login al cargar la página si hay credenciales guardadas en localStorage
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const saved = localStorage.getItem(TEAM_SESSION_KEY);
+        if (!saved) {
+          setAutoLoginChecking(false);
+          return;
+        }
+        const { dni: savedDni, password: savedPass } = JSON.parse(saved);
+        if (!savedDni || !savedPass) {
+          setAutoLoginChecking(false);
+          return;
+        }
+        // Validar credenciales contra el backend
+        const url = APPS_SCRIPT_URL +
+          "?action=login-admin" +
+          "&dni=" + encodeURIComponent(savedDni) +
+          "&password=" + encodeURIComponent(savedPass);
+        const response = await fetch(url, { method: 'GET' });
+        const data = await response.json();
+        if (data.ok) {
+          setAdmin(data.admin);
+          setIsLoggedIn(true);
+          loadClientes(savedDni, savedPass);
+        } else {
+          // Credenciales inválidas en localStorage — limpiar
+          localStorage.removeItem(TEAM_SESSION_KEY);
+        }
+      } catch (e) {
+        // Si falla, no hacemos nada y mostramos el login normal
+      } finally {
+        setAutoLoginChecking(false);
+      }
+    };
+    checkSession();
+  }, []);
+
+  const loadClientes = async (dniAdmin, passAdmin) => {
+    setIsLoadingClientes(true);
+    try {
+      const url = APPS_SCRIPT_URL +
+        "?action=clientes-list-admin" +
+        "&dni=" + encodeURIComponent(dniAdmin) +
+        "&password=" + encodeURIComponent(passAdmin);
+      const response = await fetch(url, { method: 'GET' });
+      const data = await response.json();
+      if (data.ok) {
+        setClientes(data.clientes || []);
+      } else {
+        setError(data.error || 'No pudimos cargar los clientes');
+      }
+    } catch (e) {
+      setError('Error de conexión al cargar clientes.');
+    } finally {
+      setIsLoadingClientes(false);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!dni.trim() || !password.trim()) {
+      setError('Ingresá DNI y contraseña.');
+      return;
+    }
+    setError('');
+    setIsLoading(true);
+    try {
+      const url = APPS_SCRIPT_URL +
+        "?action=login-admin" +
+        "&dni=" + encodeURIComponent(dni.trim()) +
+        "&password=" + encodeURIComponent(password.trim());
+      const response = await fetch(url, { method: 'GET' });
+      if (!response.ok) {
+        setError('No pudimos conectar con el servidor. Probá de nuevo.');
+        setIsLoading(false);
+        return;
+      }
+      const data = await response.json();
+      if (data.ok) {
+        // Guardar sesión en localStorage
+        localStorage.setItem(TEAM_SESSION_KEY, JSON.stringify({
+          dni: dni.trim(),
+          password: password.trim(),
+        }));
+        setAdmin(data.admin);
+        setIsLoggedIn(true);
+        loadClientes(dni.trim(), password.trim());
+      } else {
+        setError(data.error || 'No pudimos validar las credenciales.');
+      }
+    } catch (err) {
+      setError('Hubo un problema de conexión. Verificá tu internet o intentá más tarde.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(TEAM_SESSION_KEY);
+    setIsLoggedIn(false);
+    setAdmin(null);
+    setClientes([]);
+    setDni('');
+    setPassword('');
+    setError('');
+    setSearchTerm('');
+  };
+
+  // Pantalla de carga inicial mientras verificamos sesión guardada
+  if (autoLoginChecking) {
+    return (
+      <div className="min-h-[70vh] bg-slate-100 flex items-center justify-center">
+        <Loader2 className="animate-spin h-10 w-10 text-amber-600" />
+      </div>
+    );
+  }
+
+  // ============================== LOGIN ==============================
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-[70vh] bg-slate-100 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 max-w-md w-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-slate-900"></div>
+          <div className="flex justify-center mb-6 mt-2">
+            <div className="bg-amber-500 p-4 rounded-full shadow-lg">
+              <Briefcase className="h-8 w-8 text-slate-900" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-serif font-bold text-center text-slate-900 mb-2">Panel del Equipo</h2>
+          <p className="text-center text-slate-600 mb-6 text-sm">Acceso restringido al personal del estudio.</p>
+
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Usuario (DNI)</label>
+              <input
+                type="text"
+                value={dni}
+                onChange={(e) => setDni(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleLogin(e); }}
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                placeholder="Ej: 17691942"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleLogin(e); }}
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50 disabled:opacity-60"
+                placeholder="••••••••"
+              />
+            </div>
+            {error && <p className="text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-100">{error}</p>}
+            <button
+              onClick={handleLogin}
+              disabled={isLoading}
+              className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition-colors shadow-md mt-4 flex justify-center items-center"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                  Verificando...
+                </>
+              ) : (
+                <>
+                  Ingresar al Panel <ChevronRight className="h-5 w-5 ml-1" />
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="mt-8 text-center border-t border-slate-100 pt-5">
+            <p className="text-xs text-slate-400 flex items-center justify-center">
+              <Shield className="h-3 w-3 mr-1" /> Acceso seguro · Solo personal autorizado
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================== DASHBOARD ==============================
+  // Filtro de búsqueda
+  const clientesFiltrados = clientes.filter(c => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      (c.nombre || '').toLowerCase().includes(term) ||
+      (c.dni || '').toLowerCase().includes(term) ||
+      (c.email || '').toLowerCase().includes(term)
+    );
+  });
+
+  // Estadísticas
+  const totalClientes = clientes.length;
+  const totalCasos = clientes.reduce((sum, c) => sum + (c.casos ? c.casos.length : 0), 0);
+  const casosActivos = clientes.reduce(
+    (sum, c) => sum + (c.casos ? c.casos.filter(caso => (caso.progreso || 0) < 100).length : 0),
+    0
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-100 p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto">
+
+        {/* Header */}
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Briefcase className="h-5 w-5 text-amber-600" />
+              <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Panel del Equipo</span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900">
+              Hola, {admin && admin.nombre ? admin.nombre.split(' ')[0] : 'Equipo'}
+            </h1>
+            <p className="text-slate-600 text-sm mt-1">Gestión de clientes y casos del estudio</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-sm"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Clientes activos</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{totalClientes}</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Casos totales</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{totalCasos}</p>
+              </div>
+              <div className="bg-amber-100 p-3 rounded-lg">
+                <Briefcase className="h-6 w-6 text-amber-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">Casos en trámite</p>
+                <p className="text-3xl font-bold text-slate-900 mt-1">{casosActivos}</p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-lg">
+                <Clock className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Buscador */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar por nombre, DNI o email..."
+              className="w-full px-4 py-2.5 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition-shadow bg-slate-50"
+            />
+            <svg className="absolute left-3 top-3 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          {searchTerm && (
+            <p className="text-xs text-slate-500 mt-2">
+              Mostrando {clientesFiltrados.length} de {totalClientes} clientes
+            </p>
+          )}
+        </div>
+
+        {/* Listado de clientes */}
+        {isLoadingClientes ? (
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+            <Loader2 className="animate-spin h-10 w-10 text-amber-600 mx-auto mb-3" />
+            <p className="text-slate-600">Cargando clientes...</p>
+          </div>
+        ) : clientesFiltrados.length === 0 ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-10 text-center">
+            <Users className="h-10 w-10 text-amber-500 mx-auto mb-2" />
+            {searchTerm ? (
+              <p className="text-amber-900 font-medium">No hay clientes que coincidan con "{searchTerm}".</p>
+            ) : (
+              <p className="text-amber-900 font-medium">Todavía no hay clientes cargados.</p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {clientesFiltrados.map((c, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                {/* Header del cliente */}
+                <div className="p-5 border-b border-slate-100 bg-slate-50">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-slate-900">{c.nombre || '(Sin nombre)'}</h3>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-slate-600">
+                        <span><strong className="text-slate-700">DNI:</strong> {c.dni}</span>
+                        {c.email && <span><strong className="text-slate-700">Email:</strong> {c.email}</span>}
+                        {c.telefono && <span><strong className="text-slate-700">Tel:</strong> {c.telefono}</span>}
+                        {c.desde && <span><strong className="text-slate-700">Cliente desde:</strong> {c.desde}</span>}
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+                        {c.casos ? c.casos.length : 0} {(c.casos && c.casos.length === 1) ? 'caso' : 'casos'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Casos del cliente */}
+                {c.casos && c.casos.length > 0 ? (
+                  <div className="divide-y divide-slate-100">
+                    {c.casos.map((caso, ci) => (
+                      <div key={ci} className="p-5 hover:bg-slate-50 transition-colors">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="text-xs font-bold text-slate-500">{caso.id}</span>
+                              {caso.area && <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600">{caso.area}</span>}
+                            </div>
+                            <h4 className="font-semibold text-slate-900">{caso.titulo}</h4>
+                            {caso.organismo && <p className="text-sm text-slate-500 mt-0.5">{caso.organismo}</p>}
+                            {caso.proximoPaso && (
+                              <p className="text-sm text-slate-600 mt-2">
+                                <strong>Próximo paso:</strong> {caso.proximoPaso}
+                              </p>
+                            )}
+                            {caso.ultimaAct && (
+                              <p className="text-xs text-slate-500 mt-1 flex items-center">
+                                <Clock className="h-3 w-3 mr-1" /> Última actualización: {caso.ultimaAct}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0 sm:text-right space-y-2 sm:min-w-[180px]">
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                              caso.progreso >= 90 ? 'bg-green-100 text-green-700' :
+                              caso.progreso >= 50 ? 'bg-blue-100 text-blue-700' :
+                              'bg-amber-100 text-amber-700'
+                            }`}>
+                              {caso.estado}
+                            </span>
+                            <div>
+                              <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
+                                <span>Progreso</span>
+                                <span className="font-medium">{caso.progreso}%</span>
+                              </div>
+                              <div className="w-full bg-slate-200 rounded-full h-1.5">
+                                <div className="bg-amber-500 h-1.5 rounded-full transition-all" style={{ width: caso.progreso + "%" }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-5 text-sm text-slate-500 italic text-center">
+                    Sin casos cargados.
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Footer del panel */}
+        <div className="mt-8 text-center text-xs text-slate-500 flex items-center justify-center">
+          <Shield className="h-3 w-3 mr-1.5" />
+          Panel interno · Información confidencial sujeta a secreto profesional
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const App = () => {
   // Mapeo de view → URL path para que las URLs sean amigables
   const VIEW_TO_PATH = {
@@ -2135,6 +2547,7 @@ const App = () => {
     'memoria-post': '/memorias',
     'portal': '/portal',
     'contacto': '/contacto',
+    'equipo': '/equipo',
   };
 
   // Helper: dado el path actual del navegador, devuelve el view y slug correspondientes
@@ -2154,6 +2567,7 @@ const App = () => {
     if (first === 'quien-soy') return { view: 'quien-soy', slug: null };
     if (first === 'portal') return { view: 'portal', slug: null };
     if (first === 'contacto') return { view: 'contacto', slug: null };
+    if (first === 'equipo') return { view: 'equipo', slug: null };
     if (first === 'novedades') {
       return second ? { view: 'novedad-post', slug: second } : { view: 'novedades', slug: null };
     }
@@ -2313,6 +2727,7 @@ const App = () => {
         {currentView === 'memoria-post' && <MemoriaPostView slug={currentSlug} navigateTo={navigateTo} />}
         {currentView === 'contacto' && <ContactoView />}
         {currentView === 'portal' && <ClientPortalView />}
+        {currentView === 'equipo' && <TeamView />}
         {currentView === 'contact' && <ContactView />}
       </main>
 
