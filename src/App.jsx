@@ -2156,6 +2156,17 @@ const TeamView = () => {
   const [newClienteError, setNewClienteError] = useState('');
   const [newClienteSaved, setNewClienteSaved] = useState(false);
 
+  // Estados para subida de documentos
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadCaso, setUploadCaso] = useState(null);
+  const [uploadClienteDni, setUploadClienteDni] = useState('');
+  const [uploadClienteName, setUploadClienteName] = useState('');
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSaved, setUploadSaved] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
+
   // Auto-login al cargar la página si hay credenciales guardadas en localStorage
   useEffect(() => {
     const checkSession = async () => {
@@ -2438,6 +2449,132 @@ const TeamView = () => {
     }
   };
 
+  // ============================== SUBIDA DE DOCUMENTOS ==============================
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+  const openUploadModal = (caso, clienteDni, clienteName) => {
+    setUploadCaso(caso);
+    setUploadClienteDni(clienteDni);
+    setUploadClienteName(clienteName || '');
+    setUploadFile(null);
+    setUploadError('');
+    setUploadSaved(false);
+    setUploadProgress('');
+    setShowUploadModal(true);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setUploadCaso(null);
+    setUploadClienteDni('');
+    setUploadClienteName('');
+    setUploadFile(null);
+    setUploadError('');
+    setUploadSaved(false);
+    setUploadProgress('');
+  };
+
+  const handleFileSelect = (e) => {
+    setUploadError('');
+    const file = e.target.files && e.target.files[0];
+    if (!file) {
+      setUploadFile(null);
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError(
+        'El archivo pesa ' + (file.size / (1024 * 1024)).toFixed(1) +
+        ' MB. El máximo permitido es 10 MB. Comprimilo y volvé a intentarlo.'
+      );
+      setUploadFile(null);
+      e.target.value = '';
+      return;
+    }
+    setUploadFile(file);
+  };
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // El resultado viene como "data:application/pdf;base64,XXXXX"
+        // Necesitamos solo la parte después de la coma
+        const result = reader.result;
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleUploadFile = async () => {
+    if (!uploadFile) {
+      setUploadError('Seleccioná un archivo para subir.');
+      return;
+    }
+    if (!uploadCaso || !uploadClienteDni) {
+      setUploadError('Faltan datos del caso. Cerrá el modal y volvé a intentarlo.');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError('');
+    setUploadProgress('Preparando el archivo...');
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(TEAM_SESSION_KEY) || '{}');
+      if (!saved.dni || !saved.password) {
+        setUploadError('Sesión expirada. Volvé a iniciar sesión.');
+        setIsUploading(false);
+        return;
+      }
+
+      setUploadProgress('Convirtiendo el archivo...');
+      const base64Data = await fileToBase64(uploadFile);
+
+      setUploadProgress('Subiendo a Drive... (puede tardar unos segundos según el tamaño)');
+      const payload = {
+        action: 'upload-documento',
+        dni: saved.dni,
+        password: saved.password,
+        casoId: uploadCaso.id,
+        clienteDni: uploadClienteDni,
+        fileName: uploadFile.name,
+        fileType: uploadFile.type || 'application/octet-stream',
+        fileData: base64Data,
+      };
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        setUploadError('No pudimos conectar con el servidor. Probá de nuevo.');
+        setIsUploading(false);
+        setUploadProgress('');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.ok) {
+        setUploadSaved(true);
+        setUploadProgress('');
+        loadClientes(saved.dni, saved.password);
+        setTimeout(() => { closeUploadModal(); }, 1800);
+      } else {
+        setUploadError(data.error || 'No se pudo subir el documento.');
+        setUploadProgress('');
+      }
+    } catch (e) {
+      setUploadError('Error inesperado: ' + e.message);
+      setUploadProgress('');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Pantalla de carga inicial mientras verificamos sesión guardada
   if (autoLoginChecking) {
     return (
@@ -2713,8 +2850,44 @@ const TeamView = () => {
                               <FileText className="h-3 w-3 mr-1.5" />
                               Editar caso
                             </button>
+                            <button
+                              onClick={() => openUploadModal(caso, c.dni, c.nombre)}
+                              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium px-3 py-1.5 rounded-md transition-colors inline-flex items-center justify-center"
+                            >
+                              <Download className="h-3 w-3 mr-1.5 rotate-180" />
+                              Subir documento
+                            </button>
                           </div>
                         </div>
+
+                        {/* Documentos del caso (si los hay) */}
+                        {caso.docs && caso.docs.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-100">
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
+                              <File className="h-3 w-3 mr-1.5" />
+                              Documentos ({caso.docs.length})
+                            </p>
+                            <div className="space-y-1.5">
+                              {caso.docs.map((doc, di) => (
+                                <a
+                                  key={di}
+                                  href={doc.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center justify-between text-xs px-2 py-1.5 rounded hover:bg-slate-50 transition-colors group"
+                                >
+                                  <span className="flex items-center text-slate-700 group-hover:text-amber-700">
+                                    <FileText className="h-3.5 w-3.5 mr-2 text-slate-400 group-hover:text-amber-600" />
+                                    <span className="truncate max-w-xs">{doc.nombre}</span>
+                                  </span>
+                                  <span className="text-slate-400 flex-shrink-0 ml-2">
+                                    {doc.fecha} {doc.tamano && `· ${doc.tamano}`}
+                                  </span>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -3152,6 +3325,133 @@ const TeamView = () => {
                     </>
                   ) : (
                     'Crear cliente'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE SUBIDA DE DOCUMENTO */}
+      {showUploadModal && uploadCaso && (
+        <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full my-8 max-h-[90vh] overflow-y-auto">
+
+            <div className="sticky top-0 bg-slate-900 text-white p-5 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono bg-amber-500 text-slate-900 px-2 py-0.5 rounded font-bold">{uploadCaso.id}</span>
+                  {uploadClienteName && <span className="text-xs text-slate-300">· {uploadClienteName}</span>}
+                </div>
+                <h3 className="text-lg font-serif font-bold">Subir documento al caso</h3>
+              </div>
+              <button
+                onClick={closeUploadModal}
+                disabled={isUploading}
+                className="text-slate-300 hover:text-white p-1 rounded-md hover:bg-slate-800 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+
+              {uploadSaved && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center text-green-800">
+                  <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span className="text-sm font-medium">Documento subido correctamente.</span>
+                </div>
+              )}
+
+              {!uploadSaved && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Archivo a subir</label>
+                    <input
+                      type="file"
+                      onChange={handleFileSelect}
+                      disabled={isUploading}
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                      className="block w-full text-sm text-slate-700
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-medium
+                        file:bg-slate-900 file:text-white
+                        hover:file:bg-slate-800
+                        file:cursor-pointer
+                        disabled:opacity-60 disabled:cursor-not-allowed"
+                    />
+                    <p className="text-xs text-slate-500 mt-2">
+                      Formatos aceptados: PDF, Word, imágenes (JPG/PNG), texto. Tamaño máximo: 10 MB.
+                    </p>
+                  </div>
+
+                  {uploadFile && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-md p-3 flex items-center">
+                      <FileText className="h-5 w-5 mr-3 text-slate-500 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate">{uploadFile.name}</p>
+                        <p className="text-xs text-slate-500">
+                          {(uploadFile.size / 1024).toFixed(1) > 1024
+                            ? (uploadFile.size / (1024 * 1024)).toFixed(2) + ' MB'
+                            : (uploadFile.size / 1024).toFixed(1) + ' KB'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {uploadProgress && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3 flex items-center text-blue-800 text-sm">
+                      <Loader2 className="animate-spin h-4 w-4 mr-2 flex-shrink-0" />
+                      {uploadProgress}
+                    </div>
+                  )}
+
+                  <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-xs text-amber-900">
+                    <p className="font-medium mb-1">¿Dónde se guarda?</p>
+                    <p>
+                      El archivo se sube a Google Drive del estudio, dentro de una subcarpeta automática para
+                      {uploadClienteName ? ' ' + uploadClienteName : ' este cliente'} (DNI {uploadClienteDni}).
+                      Si es el primer documento del cliente, se crea la subcarpeta. El cliente podrá verlo y descargarlo
+                      desde su Portal del Cliente.
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {uploadError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700">
+                  {uploadError}
+                </div>
+              )}
+
+              <div className="bg-slate-50 -mx-6 -mb-6 px-6 py-4 rounded-b-2xl border-t border-slate-200 flex flex-col sm:flex-row sm:justify-end gap-2">
+                <button
+                  onClick={closeUploadModal}
+                  disabled={isUploading}
+                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleUploadFile}
+                  disabled={isUploading || uploadSaved || !uploadFile}
+                  className="px-5 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-md transition-colors inline-flex items-center justify-center min-w-[140px]"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                      Subiendo...
+                    </>
+                  ) : uploadSaved ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Subido
+                    </>
+                  ) : (
+                    'Subir documento'
                   )}
                 </button>
               </div>
