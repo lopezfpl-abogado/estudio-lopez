@@ -3588,10 +3588,7 @@ const App = () => {
                       <FileText className="h-4 w-4 mr-3 text-amber-600" />
                       Sucesiones
                     </button>
-                    <button onClick={() => navigateTo('civil')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'civil' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
-                      <Users className="h-4 w-4 mr-3 text-amber-600" />
-                      Civil y Familia
-                    </button>
+                    {/* Civil y Familia — oculto temporalmente */}
                     <div className="border-t border-slate-100 my-1"></div>
                     <button onClick={() => navigateTo('empresas')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'empresas' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
                       <Briefcase className="h-4 w-4 mr-3 text-amber-600" />
@@ -3630,7 +3627,7 @@ const App = () => {
               <div className="px-3 pt-3 pb-1 text-xs font-bold text-amber-500 uppercase tracking-wider">Servicios</div>
               <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
-              <button onClick={() => navigateTo('civil')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Civil y Familia</button>
+              {/* Civil y Familia — oculto temporalmente */}
               <button onClick={() => navigateTo('empresas')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Asesoramiento Empresarial</button>
 
               {/* Resto del menú */}
@@ -3648,8 +3645,8 @@ const App = () => {
       {/* Main Content Area */}
       <main className="flex-grow">
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
-        {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
-        {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
+        {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} showPortalAccess />}
+        {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} showPortalAccess />}
         {currentView === 'sucesiones' && <DocumentacionSucesiones />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
         {currentView === 'empresas' && <AsesoramientoEmpresarialView navigateTo={navigateTo} />}
@@ -3682,7 +3679,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('home')} className="hover:text-amber-500 transition-colors">Inicio</button></li>
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
-              <li><button onClick={() => navigateTo('civil')} className="hover:text-amber-500 transition-colors">Civil y Familia</button></li>
+              {/* Civil y Familia — oculto temporalmente */}
               <li><button onClick={() => navigateTo('empresas')} className="hover:text-amber-500 transition-colors">Asesoramiento Empresarial</button></li>
               <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
@@ -3948,7 +3945,7 @@ const DocumentacionSucesiones = () => {
   );
 };
 
-const ServiceDetailView = ({ title, icon, body, navigateTo }) => {
+const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess }) => {
   const paragraphs = body.split('\n\n');
   return (
     <div className="py-16 bg-slate-50 min-h-[60vh]">
@@ -3977,6 +3974,23 @@ const ServiceDetailView = ({ title, icon, body, navigateTo }) => {
             Consultar por WhatsApp
           </a>
         </div>
+        {showPortalAccess && (
+          <div className="mt-6 text-center">
+            <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-x-4 gap-y-2 bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-4">
+              <p className="text-sm text-slate-600">
+                ¿Ya sos cliente del estudio? Seguí el estado de tu trámite en línea.
+              </p>
+              <button
+                onClick={() => navigateTo('portal')}
+                className="inline-flex items-center text-amber-700 hover:text-amber-800 font-medium text-sm transition-colors whitespace-nowrap"
+              >
+                <Shield className="h-4 w-4 mr-1.5" />
+                Ingresar al Portal del Cliente
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
