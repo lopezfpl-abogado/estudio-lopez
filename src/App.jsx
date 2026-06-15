@@ -3650,6 +3650,7 @@ const App = () => {
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
         {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} />}
+        {currentView === 'sucesiones' && <DocumentacionSucesiones />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
         {currentView === 'empresas' && <AsesoramientoEmpresarialView navigateTo={navigateTo} />}
         {currentView === 'quien-soy' && <QuienSoyView navigateTo={navigateTo} />}
@@ -3843,6 +3844,109 @@ const HomeView = ({ navigateTo }) => (
     <NovedadesDerechoHome navigateTo={navigateTo} />
   </div>
 );
+
+const DocumentacionSucesiones = () => {
+  const grupos = [
+    {
+      icon: <FileText className="h-6 w-6 text-amber-600" />,
+      titulo: '1. Documentación personal esencial',
+      intro: 'Lo indispensable para abrir el trámite.',
+      items: [
+        'Partida de defunción original del causante.',
+        'DNI del causante (o datos de su último domicilio real).',
+        'DNI de todos los herederos que se presenten en el juicio.',
+      ],
+    },
+    {
+      icon: <Users className="h-6 w-6 text-amber-600" />,
+      titulo: '2. Documentación que acredita el vínculo',
+      intro: 'Según el parentesco que concurra a la herencia.',
+      items: [
+        'Si era casado/a: partida o acta de matrimonio actualizada.',
+        'Si tenía hijos: partida de nacimiento de cada uno.',
+        'Si un hijo falleció antes: su partida de defunción y las de nacimiento de los nietos (derecho de representación).',
+        'Si no tenía hijos y viven los padres: partida de nacimiento del causante.',
+        'Si hay testamento: el original o la indicación de dónde se encuentra.',
+      ],
+    },
+    {
+      icon: <Briefcase className="h-6 w-6 text-amber-600" />,
+      titulo: '3. Documentación de los bienes',
+      intro: 'Para la denuncia, inventario y avalúo del acervo hereditario.',
+      items: [
+        'Inmuebles: escrituras, certificados de dominio y boleta de ARBA (valuación fiscal).',
+        'Vehículos: título de propiedad y cédula verde.',
+        'Cuentas bancarias o plazos fijos: banco, sucursal y constancias de saldo.',
+        'Sociedades o empresas: estatutos, contratos, cuotas o acciones.',
+      ],
+    },
+    {
+      icon: <MessageSquare className="h-6 w-6 text-amber-600" />,
+      titulo: '4. Información complementaria',
+      intro: 'Datos que conviene tener a mano desde el inicio.',
+      items: [
+        '¿Existen otros herederos, aunque no se presenten ahora? (Hay obligación legal de denunciarlos.)',
+        '¿El causante realizó donaciones en vida a algún heredero? (Puede dar lugar a colación o reducción.)',
+        '¿Hay deudas urgentes o acreedores conocidos del causante?',
+      ],
+    },
+  ];
+
+  return (
+    <section className="bg-slate-50 pb-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center bg-amber-50 text-amber-700 rounded-full px-4 py-1.5 text-sm font-medium mb-4 border border-amber-100">
+            Guía práctica
+          </div>
+          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-3">
+            Documentación para iniciar una sucesión
+          </h2>
+          <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg">
+            Reunir esta documentación de antemano agiliza el inicio del trámite. No hace falta tenerla
+            completa para una primera consulta: avanzamos con lo que haya y vamos completando el resto.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {grupos.map((g, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+              <div className="flex items-center mb-3">
+                <div className="bg-amber-50 rounded-lg w-11 h-11 flex items-center justify-center mr-3 border border-amber-100 flex-shrink-0">
+                  {g.icon}
+                </div>
+                <h3 className="text-lg font-serif font-bold text-slate-900 leading-snug">{g.titulo}</h3>
+              </div>
+              <p className="text-slate-500 text-sm mb-4">{g.intro}</p>
+              <ul className="space-y-2.5">
+                {g.items.map((item, j) => (
+                  <li key={j} className="flex items-start text-slate-700 text-sm md:text-base leading-relaxed">
+                    <CheckCircle className="h-4 w-4 text-amber-500 mr-2.5 mt-1 flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 bg-white rounded-xl border border-slate-200 shadow-sm p-6 text-center">
+          <p className="text-slate-700 text-base md:text-lg mb-1">¿Ya reuniste parte de esta documentación?</p>
+          <p className="text-slate-500 text-sm mb-4">Escribime y coordinamos una reunión para suscribir los escritos iniciales.</p>
+          <a
+            href={buildWhatsAppUrl("Hola Dr. López, quería consultarle por una sucesión y ya estoy reuniendo la documentación.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors"
+          >
+            <WhatsAppIcon className="h-5 w-5 mr-2" />
+            Consultar por WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const ServiceDetailView = ({ title, icon, body, navigateTo }) => {
   const paragraphs = body.split('\n\n');
