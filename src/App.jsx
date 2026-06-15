@@ -401,7 +401,7 @@ const AsesoramientoEmpresarialView = ({ navigateTo }) => {
             ¿Querés que conversemos sobre tu empresa?
           </h2>
           <p className="text-lg text-slate-700 mb-8 leading-relaxed">
-            La primera reunión es sin cargo y sin compromiso. Charlamos sobre tu situación actual y vemos si un abono te conviene.
+            La primera reunión es sin compromiso. Charlamos sobre tu situación actual y vemos si un abono te conviene.
           </p>
           <a
             href={buildWhatsAppUrl('Hola Dr. López, soy de una empresa interesada en el servicio de Asesoramiento Empresarial. ¿Podemos coordinar una reunión?')}
@@ -604,19 +604,17 @@ const QuienSoyView = ({ navigateTo }) => {
       {/* CTA final */}
       <section className="py-16 bg-gradient-to-br from-green-50 to-amber-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3">¿Querés conversar sobre tu caso?</h2>
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3">¿Querés que evaluemos tu caso?</h2>
           <p className="text-slate-700 mb-8 leading-relaxed">
-            La primera consulta es sin cargo. Escribime por WhatsApp y vemos juntos cómo puedo ayudarte.
+            Las consultas se realizan mediante una Consulta Profesional por videollamada. Pedila y coordinamos día y horario.
           </p>
-          <a
-            href={buildWhatsAppUrl('Hola Dr. López, vi su sitio y quería hacerle una consulta.')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-green-500 hover:bg-green-600 text-white font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+          <button
+            onClick={() => navigateTo('entrevista')}
+            className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
           >
-            <WhatsAppIcon className="h-6 w-6 mr-3" />
-            Consultar por WhatsApp
-          </a>
+            <Calendar className="h-6 w-6 mr-3" />
+            Pedí tu Consulta Profesional
+          </button>
         </div>
       </section>
     </div>
@@ -3472,6 +3470,7 @@ const App = () => {
     'sucesiones': '/sucesiones',
     'civil': '/civil-y-familia',
     'empresas': '/empresas',
+    'entrevista': '/consulta-profesional',
     'quien-soy': '/quien-soy',
     'novedades': '/novedades',
     'novedad-post': '/novedades',
@@ -3498,6 +3497,7 @@ const App = () => {
     if (first === 'sucesiones') return { view: 'sucesiones', slug: null };
     if (first === 'civil-y-familia' || first === 'civil') return { view: 'civil', slug: null };
     if (first === 'empresas') return { view: 'empresas', slug: null };
+    if (first === 'consulta-profesional' || first === 'entrevista') return { view: 'entrevista', slug: null };
     if (first === 'quien-soy') return { view: 'quien-soy', slug: null };
     if (first === 'portal') return { view: 'portal', slug: null };
     if (first === 'contacto') return { view: 'contacto', slug: null };
@@ -3602,6 +3602,7 @@ const App = () => {
               <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('contacto')} className={`hover:text-amber-400 transition-colors ${currentView === 'contacto' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Contacto</button>
+              <button onClick={() => navigateTo('entrevista')} className={`px-4 py-2 rounded-md font-semibold transition-colors ${currentView === 'entrevista' ? 'bg-amber-600 text-slate-900' : 'bg-amber-500 hover:bg-amber-600 text-slate-900'}`}>Consulta Profesional</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
             </nav>
 
@@ -3636,6 +3637,7 @@ const App = () => {
               <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('contacto')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Contacto</button>
+              <button onClick={() => navigateTo('entrevista')} className="block w-full text-left px-3 py-2 text-base font-semibold text-amber-400 hover:bg-slate-700 rounded-md">Consulta Profesional</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
             </div>
           </div>
@@ -3650,6 +3652,7 @@ const App = () => {
         {currentView === 'sucesiones' && <DocumentacionSucesiones />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
         {currentView === 'empresas' && <AsesoramientoEmpresarialView navigateTo={navigateTo} />}
+        {currentView === 'entrevista' && <EntrevistaEvaluacionView navigateTo={navigateTo} />}
         {currentView === 'quien-soy' && <QuienSoyView navigateTo={navigateTo} />}
         {currentView === 'novedades' && <NovedadesListView navigateTo={navigateTo} />}
         {currentView === 'novedad-post' && <NovedadPostView slug={currentSlug} navigateTo={navigateTo} />}
@@ -3681,6 +3684,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
               {/* Civil y Familia — oculto temporalmente */}
               <li><button onClick={() => navigateTo('empresas')} className="hover:text-amber-500 transition-colors">Asesoramiento Empresarial</button></li>
+              <li><button onClick={() => navigateTo('entrevista')} className="hover:text-amber-500 transition-colors">Consulta Profesional</button></li>
               <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
@@ -3727,15 +3731,13 @@ const HomeView = ({ navigateTo }) => (
             Soy Juan Fernando López, abogado con más de 35 años de trayectoria. Combino el sólido ejercicio del derecho con la modernización digital para resolver tus problemas legales y gestionar trámites evitando demoras, optimizando tu tiempo y manteniéndote informado.
           </p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <a
-              href={buildWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center shadow-lg ring-4 ring-green-500/20"
+            <button
+              onClick={() => navigateTo('entrevista')}
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center shadow-lg ring-4 ring-amber-500/20"
             >
-              <WhatsAppIcon className="h-6 w-6 mr-2" />
-              Consultá ahora por WhatsApp
-            </a>
+              <Calendar className="h-6 w-6 mr-2" />
+              Pedí tu Consulta Profesional
+            </button>
             <button
               onClick={() => navigateTo('portal')}
               className="bg-transparent border border-slate-500 hover:bg-slate-800 text-white px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center"
@@ -3842,6 +3844,127 @@ const HomeView = ({ navigateTo }) => (
   </div>
 );
 
+const EntrevistaEvaluacionView = ({ navigateTo }) => {
+  // VALOR DE LA ENTREVISTA: editá este texto con el monto que definas, por ejemplo "$25.000".
+  // Si lo dejás en "a coordinar", el monto se acuerda por WhatsApp.
+  const VALOR_ENTREVISTA = "a coordinar";
+
+  const pasos = [
+    { num: '1', titulo: 'Planteás tu tema', desc: 'Nos escribís por WhatsApp y nos contás, en pocas líneas, de qué se trata tu caso.' },
+    { num: '2', titulo: 'Coordinamos la videollamada', desc: 'Acordamos día y horario, y te confirmamos el valor de la consulta.' },
+    { num: '3', titulo: 'Realizamos la consulta', desc: 'En la videollamada analizamos tu caso a fondo: viabilidad, alternativas y una estrategia concreta.' },
+    { num: '4', titulo: 'Si avanzamos juntos', desc: 'El valor de la consulta se acredita a cuenta de los honorarios. Si seguimos, la consulta no te costó nada.' },
+  ];
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
+            <Calendar className="h-3 w-3 mr-1.5" />
+            CONSULTA PROFESIONAL
+          </div>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+            Una evaluación seria de tu caso, por videollamada.
+          </h1>
+          <p className="inline-flex items-center bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-full px-4 py-1.5 text-sm md:text-base font-medium mb-6">
+            Servicio arancelado · por videollamada
+          </p>
+          <p className="text-xl md:text-2xl text-slate-300 leading-relaxed">
+            No doy opiniones legales al voleo. Reservá una consulta formal donde analizamos tu situación con tiempo, rigor y una estrategia concreta para avanzar.
+          </p>
+        </div>
+      </section>
+
+      {/* Por qué tiene valor */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Tiempo dedicado a vos</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Una videollamada reservada para tu caso, sin apuro. Llegás con dudas y te vas con un panorama claro de tu situación legal.
+              </p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <Scale className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Un dictamen, no una charla</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Analizo la viabilidad real de tu caso, las alternativas y los riesgos, y te propongo una estrategia concreta. Es trabajo profesional, y por eso tiene un valor.
+              </p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                <CheckCircle className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Se acredita al trabajo</h3>
+              <p className="text-slate-600 leading-relaxed">
+                Si después decidimos avanzar juntos, el valor de la consulta se descuenta de los honorarios. En la práctica, si seguimos, la consulta no te costó nada.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cómo funciona */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Cómo funciona</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Cuatro pasos simples, del primer mensaje a la estrategia.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pasos.map((paso, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-lg mb-4">
+                  {paso.num}
+                </div>
+                <h3 className="font-serif font-bold text-slate-900 mb-2">{paso.titulo}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{paso.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Valor + CTA */}
+      <section className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 md:p-12 text-center shadow-xl">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-3">Reservá tu Consulta Profesional</h2>
+            <p className="text-slate-300 mb-8 leading-relaxed">
+              Modalidad videollamada · Valor: {VALOR_ENTREVISTA} · Se acredita a los honorarios si avanzamos juntos.
+            </p>
+            <a
+              href={buildWhatsAppUrl("Hola Dr. López, quiero solicitar una Consulta Profesional por videollamada. Mi tema es: ")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+            >
+              <WhatsAppIcon className="h-6 w-6 mr-3" />
+              Pedir mi consulta por WhatsApp
+            </a>
+            <p className="text-sm text-slate-400 mt-6">
+              ¿Ya sos cliente del estudio?{" "}
+              <button onClick={() => navigateTo('portal')} className="text-amber-400 hover:text-amber-300 font-medium underline">
+                Ingresá al Portal del Cliente
+              </button>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
 const DocumentacionSucesiones = () => {
   const grupos = [
     {
@@ -3901,7 +4024,7 @@ const DocumentacionSucesiones = () => {
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg">
             Reunir esta documentación de antemano agiliza el inicio del trámite. No hace falta tenerla
-            completa para una primera consulta: avanzamos con lo que haya y vamos completando el resto.
+            completa para dar el primer paso: avanzamos con lo que haya y vamos completando el resto.
           </p>
         </div>
 
