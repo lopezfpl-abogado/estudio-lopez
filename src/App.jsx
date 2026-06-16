@@ -2164,6 +2164,16 @@ const TeamView = () => {
   const [uploadSaved, setUploadSaved] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
+  // Estados para cargar Blog / Novedad
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postForm, setPostForm] = useState({
+    tipo: 'novedad', titulo: '', fecha: '', categoria: 'General', subtitulo: '',
+    resumen: '', imagen: '', youtubeId: '', cuerpo: '',
+  });
+  const [isSavingPost, setIsSavingPost] = useState(false);
+  const [postError, setPostError] = useState('');
+  const [postSaved, setPostSaved] = useState(false);
+
 
   // Auto-login al cargar la página si hay credenciales guardadas en localStorage
   useEffect(() => {
@@ -2273,6 +2283,64 @@ const TeamView = () => {
     setError('');
     setSearchTerm('');
   };
+
+  const openPostModal = () => {
+    setPostForm({ tipo: 'novedad', titulo: '', fecha: '', categoria: 'General', subtitulo: '', resumen: '', imagen: '', youtubeId: '', cuerpo: '' });
+    setPostError('');
+    setPostSaved(false);
+    setShowPostModal(true);
+  };
+
+  const closePostModal = () => {
+    if (isSavingPost) return;
+    setShowPostModal(false);
+  };
+
+  const handleCreatePost = async () => {
+    if (!postForm.titulo.trim()) { setPostError('El título es obligatorio.'); return; }
+    if (!postForm.cuerpo.trim()) { setPostError('El texto de la publicación es obligatorio.'); return; }
+    setIsSavingPost(true);
+    setPostError('');
+    try {
+      const saved = JSON.parse(localStorage.getItem(TEAM_SESSION_KEY) || '{}');
+      if (!saved.dni || !saved.password) {
+        setPostError('Sesión expirada. Volvé a iniciar sesión.');
+        setIsSavingPost(false);
+        return;
+      }
+      const payload = {
+        action: postForm.tipo === 'blog' ? 'add-blog' : 'add-novedad',
+        dni: saved.dni,
+        password: saved.password,
+        titulo: postForm.titulo.trim(),
+        fecha: postForm.fecha,
+        resumen: postForm.resumen.trim(),
+        imagen: postForm.imagen.trim(),
+        cuerpo: postForm.cuerpo,
+        categoria: postForm.categoria,
+        subtitulo: postForm.subtitulo.trim(),
+        youtubeId: postForm.youtubeId.trim(),
+      };
+      const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      if (!response.ok) {
+        setPostError('No pudimos conectar con el servidor. Probá de nuevo.');
+        setIsSavingPost(false);
+        return;
+      }
+      const data = await response.json();
+      if (data.ok) {
+        setPostSaved(true);
+        setTimeout(() => { setShowPostModal(false); }, 1600);
+      } else {
+        setPostError(data.error || 'No se pudo guardar la publicación.');
+      }
+    } catch (err) {
+      setPostError('Hubo un problema de conexión. Intentá de nuevo.');
+    } finally {
+      setIsSavingPost(false);
+    }
+  };
+
 
   // ============================== EDICIÓN DE CASOS ==============================
   const openEditModal = (caso, clienteName) => {
@@ -2693,6 +2761,13 @@ const TeamView = () => {
             >
               <Users className="h-4 w-4 mr-1.5" />
               Nuevo cliente
+            </button>
+            <button
+              onClick={openPostModal}
+              className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-sm inline-flex items-center"
+            >
+              <Newspaper className="h-4 w-4 mr-1.5" />
+              Cargar publicación
             </button>
             <button
               onClick={handleLogout}
@@ -3332,6 +3407,112 @@ const TeamView = () => {
       )}
 
       {/* MODAL DE SUBIDA DE DOCUMENTO */}
+      {showPostModal && (
+        <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-slate-900 text-white p-5 flex items-center justify-between rounded-t-2xl">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Newspaper className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Contenido del sitio</span>
+                </div>
+                <h3 className="text-lg font-serif font-bold">Cargar publicación</h3>
+              </div>
+              <button onClick={closePostModal} disabled={isSavingPost} className="text-slate-300 hover:text-white p-1 rounded-md hover:bg-slate-800 transition-colors" aria-label="Cerrar">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {postSaved && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 flex items-center text-green-800">
+                  <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                  <span className="text-sm font-medium">¡Publicado! Ya aparece en el sitio.</span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">¿Qué querés cargar?</label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setPostForm({ ...postForm, tipo: 'novedad' })} disabled={isSavingPost} className={`flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${postForm.tipo === 'novedad' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'}`}>
+                    Novedad del Derecho
+                  </button>
+                  <button type="button" onClick={() => setPostForm({ ...postForm, tipo: 'blog' })} disabled={isSavingPost} className={`flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${postForm.tipo === 'blog' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'}`}>
+                    Entrada de Blog
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Título <span className="text-red-500">*</span></label>
+                <input type="text" value={postForm.titulo} onChange={(e) => setPostForm({ ...postForm, titulo: e.target.value })} disabled={isSavingPost} placeholder="Título de la publicación" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+                <p className="text-xs text-slate-400 mt-1">La dirección del artículo se genera sola a partir del título.</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Fecha</label>
+                  <input type="date" value={postForm.fecha} onChange={(e) => setPostForm({ ...postForm, fecha: e.target.value })} disabled={isSavingPost} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+                  <p className="text-xs text-slate-400 mt-1">Si la dejás vacía, se usa la fecha de hoy.</p>
+                </div>
+                {postForm.tipo === 'novedad' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
+                    <select value={postForm.categoria} onChange={(e) => setPostForm({ ...postForm, categoria: e.target.value })} disabled={isSavingPost} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60">
+                      <option>General</option>
+                      <option>Familia</option>
+                      <option>Laboral</option>
+                      <option>Sucesiones</option>
+                      <option>Civil</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Subtítulo</label>
+                    <input type="text" value={postForm.subtitulo} onChange={(e) => setPostForm({ ...postForm, subtitulo: e.target.value })} disabled={isSavingPost} placeholder="Opcional" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Resumen / copete</label>
+                <textarea value={postForm.resumen} onChange={(e) => setPostForm({ ...postForm, resumen: e.target.value })} disabled={isSavingPost} rows={2} placeholder="Una o dos líneas que resuman la publicación (aparece en la tarjeta)." className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Imagen (URL)</label>
+                <input type="text" value={postForm.imagen} onChange={(e) => setPostForm({ ...postForm, imagen: e.target.value })} disabled={isSavingPost} placeholder="https://..." className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+                <p className="text-xs text-slate-400 mt-1">Pegá el enlace de una imagen. Opcional.</p>
+              </div>
+
+              {postForm.tipo === 'blog' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Video de YouTube (ID)</label>
+                  <input type="text" value={postForm.youtubeId} onChange={(e) => setPostForm({ ...postForm, youtubeId: e.target.value })} disabled={isSavingPost} placeholder="Ej: dQw4w9WgXcQ" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60" />
+                  <p className="text-xs text-slate-400 mt-1">Solo el código que va después de "watch?v=". Opcional.</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Texto de la publicación <span className="text-red-500">*</span></label>
+                <textarea value={postForm.cuerpo} onChange={(e) => setPostForm({ ...postForm, cuerpo: e.target.value })} disabled={isSavingPost} rows={10} placeholder="Escribí acá el contenido completo. Separá los párrafos con un renglón en blanco." className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-slate-50 disabled:opacity-60 font-mono text-sm" />
+              </div>
+
+              {postError && <p className="text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-100">{postError}</p>}
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={closePostModal} disabled={isSavingPost} className="flex-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 px-4 py-3 rounded-lg font-medium transition-colors disabled:opacity-60">
+                  Cancelar
+                </button>
+                <button onClick={handleCreatePost} disabled={isSavingPost} className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-400 text-white px-4 py-3 rounded-lg font-medium transition-colors flex justify-center items-center shadow-md">
+                  {isSavingPost ? (<><Loader2 className="animate-spin h-5 w-5 mr-2" /> Publicando...</>) : (<>Publicar</>)}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showUploadModal && uploadCaso && (
         <div className="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full my-8 max-h-[90vh] overflow-y-auto">
