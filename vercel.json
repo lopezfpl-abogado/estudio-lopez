@@ -1,5 +1,27 @@
 {
   "rewrites": [
+    {
+      "source": "/novedades/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Pinterest|redditbot|Applebot|SkypeUriPreview|Embedly|Iframely|Googlebot|bingbot|vkShare|W3C_Validator).*"
+        }
+      ],
+      "destination": "/api/share?tipo=novedad&slug=:slug"
+    },
+    {
+      "source": "/blog/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|WhatsApp|LinkedInBot|Slackbot|TelegramBot|Discordbot|Pinterest|redditbot|Applebot|SkypeUriPreview|Embedly|Iframely|Googlebot|bingbot|vkShare|W3C_Validator).*"
+        }
+      ],
+      "destination": "/api/share?tipo=blog&slug=:slug"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
