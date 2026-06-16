@@ -3647,7 +3647,7 @@ const App = () => {
       {/* Main Content Area */}
       <main className="flex-grow">
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
-        {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} showPortalAccess urlTurnera={URL_TURNERA} />}
+        {currentView === 'jubilaciones' && <JubilacionesView navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} showPortalAccess />}
         {currentView === 'sucesiones' && <DocumentacionSucesiones />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
@@ -3967,6 +3967,148 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
 
 // URL de la turnera web. Cambiá esta dirección por la real cuando publiques la turnera.
 const URL_TURNERA = "https://calendar.app.google/431EkFXRA8kHyFPM6";
+
+const JubilacionesView = ({ navigateTo }) => {
+  const fortalezas = [
+    {
+      icon: <Scale className="h-6 w-6 text-amber-600" />,
+      titulo: 'Experiencia y sentido común',
+      desc: 'No veo expedientes; veo personas. Pongo a tu servicio décadas de trayectoria jurídica para analizar tu caso real, sin falsas promesas, buscando siempre el camino más eficiente y favorable para vos.',
+    },
+    {
+      icon: <Send className="h-6 w-6 text-amber-600" />,
+      titulo: 'Gestión tecnológica avanzada',
+      desc: 'El sistema es digital, y yo también. Utilizo las herramientas más modernas para acelerar la presentación de tus documentos, hacer seguimientos en tiempo real y evitar que tu trámite quede archivado en el olvido de una plataforma.',
+    },
+    {
+      icon: <Shield className="h-6 w-6 text-amber-600" />,
+      titulo: 'Tranquilidad de principio a fin',
+      desc: 'Te acompaño desde el primer día hasta que cobrás tu primer haber o lográs el reajuste que te corresponde, explicándote cada paso en un lenguaje claro, sin tecnicismos innecesarios.',
+    },
+  ];
+
+  return (
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500/15 rounded-2xl mb-6">
+            <Clock className="h-8 w-8 text-amber-400" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6 leading-tight">
+            El respaldo que necesitás.<br />La tranquilidad que merecés.
+          </h1>
+          <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-3xl mx-auto">
+            Iniciar tu camino hacia la jubilación o reclamar lo que legítimamente te corresponde no tiene por qué ser una carga llena de dudas, esperas y burocracia. Estás ante una nueva etapa de la vida, y tu única ocupación debería ser disfrutarla.
+          </p>
+        </div>
+      </section>
+
+      {/* Por qué acompañado */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4 text-center">
+            ¿Por qué hacer tu trámite acompañado?
+          </h2>
+          <p className="text-slate-600 leading-relaxed text-center max-w-3xl mx-auto mb-4">
+            Hoy los organismos previsionales migraron casi por completo al entorno digital. Lo que prometía ser "más fácil" a veces se transforma en pantallas que fallan, claves que se bloquean y expedientes virtuales que parecen estancados en el sistema.
+          </p>
+          <p className="text-slate-700 font-medium text-center mb-10">
+            Ahí es donde marco la diferencia para que no estés solo:
+          </p>
+
+          <div className="space-y-6">
+            {fortalezas.map((f, i) => (
+              <div key={i} className="flex items-start bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <div className="bg-amber-50 rounded-lg w-12 h-12 flex items-center justify-center mr-4 border border-amber-100 flex-shrink-0">
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className="text-lg font-serif font-bold text-slate-900 mb-1.5">{f.titulo}</h3>
+                  <p className="text-slate-600 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-xl md:text-2xl font-serif font-bold text-slate-900 mt-12">
+            Hagamos que el sistema trabaje para vos, no en tu contra.
+          </p>
+        </div>
+      </section>
+
+      {/* Dos opciones de contacto */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-3">Empezar es muy simple</h2>
+            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Ya diste el paso más importante; ahora dejá el resto en mis manos. No tenés que llenar formularios largos ni entender de sistemas complejos. Elegí la opción que te quede más cómoda:
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mt-10">
+            {/* Opción WhatsApp */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col">
+              <div className="flex items-center mb-3">
+                <div className="bg-green-50 rounded-lg w-11 h-11 flex items-center justify-center mr-3">
+                  <WhatsAppIcon className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-serif font-bold text-slate-900">Hablamos ahora por WhatsApp</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-6 flex-grow">
+                Si preferís contarme tu situación directamente o sacarte una duda rápida, escribime. Te atiende una persona real, no un robot de respuestas automáticas.
+              </p>
+              <a
+                href={buildWhatsAppUrl("Hola Dr. López, quería hacerle una consulta sobre jubilaciones.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center justify-center shadow-md"
+              >
+                <WhatsAppIcon className="h-5 w-5 mr-2" />
+                Enviar un WhatsApp
+              </a>
+            </div>
+
+            {/* Opción Turno */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col">
+              <div className="flex items-center mb-3">
+                <div className="bg-amber-50 rounded-lg w-11 h-11 flex items-center justify-center mr-3">
+                  <Calendar className="h-6 w-6 text-amber-600" />
+                </div>
+                <h3 className="text-xl font-serif font-bold text-slate-900">Reservá tu turno en el calendario</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-6 flex-grow">
+                Si preferís organizar tu día y asegurarte un momento exclusivo para analizar tu caso (por teléfono o videollamada), elegí el día y la hora que te convengan.
+              </p>
+              <a
+                href={URL_TURNERA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center justify-center shadow-md"
+              >
+                <Calendar className="h-5 w-5 mr-2" />
+                Elegir día y hora
+              </a>
+            </div>
+          </div>
+
+          {/* Acceso al portal */}
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => navigateTo('portal')}
+              className="inline-flex items-center text-amber-700 hover:text-amber-800 font-medium text-sm transition-colors"
+            >
+              <Shield className="h-4 w-4 mr-1.5" />
+              ¿Ya sos cliente? Ingresá al Portal del Cliente
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
 
 const DocumentacionSucesiones = () => {
   const grupos = [
