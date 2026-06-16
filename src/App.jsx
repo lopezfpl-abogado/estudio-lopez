@@ -3647,7 +3647,7 @@ const App = () => {
       {/* Main Content Area */}
       <main className="flex-grow">
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
-        {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} showPortalAccess />}
+        {currentView === 'jubilaciones' && <ServiceDetailView title="Jubilaciones y Pensiones" icon={<Clock className="h-12 w-12 text-amber-600" />} body={TEXTO_JUBILACIONES} navigateTo={navigateTo} showPortalAccess urlTurnera={URL_TURNERA} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} showPortalAccess />}
         {currentView === 'sucesiones' && <DocumentacionSucesiones />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
@@ -3965,6 +3965,9 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
   );
 };
 
+// URL de la turnera web. Cambiá esta dirección por la real cuando publiques la turnera.
+const URL_TURNERA = "https://calendar.app.google/431EkFXRA8kHyFPM6";
+
 const DocumentacionSucesiones = () => {
   const grupos = [
     {
@@ -4068,7 +4071,7 @@ const DocumentacionSucesiones = () => {
   );
 };
 
-const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess }) => {
+const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess, urlTurnera }) => {
   const paragraphs = body.split('\n\n');
   return (
     <div className="py-16 bg-slate-50 min-h-[60vh]">
@@ -4086,7 +4089,7 @@ const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess }) 
             </p>
           ))}
         </div>
-        <div className="mt-10 text-center">
+        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <a
             href={buildWhatsAppUrl("Hola Dr. López, vi su sitio y quería hacerle una consulta sobre " + title + ".")}
             target="_blank"
@@ -4096,6 +4099,17 @@ const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess }) 
             <WhatsAppIcon className="h-5 w-5 mr-2" />
             Consultar por WhatsApp
           </a>
+          {urlTurnera && (
+            <a
+              href={urlTurnera}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-md font-medium text-lg transition-all inline-flex items-center shadow-md"
+            >
+              <Calendar className="h-5 w-5 mr-2" />
+              Sacar un turno
+            </a>
+          )}
         </div>
         {showPortalAccess && (
           <div className="mt-6 text-center">
