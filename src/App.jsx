@@ -3845,114 +3845,90 @@ const HomeView = ({ navigateTo }) => (
 );
 
 const EntrevistaEvaluacionView = ({ navigateTo }) => {
-  // VALOR DE LA ENTREVISTA: editá este texto con el monto que definas, por ejemplo "$25.000".
-  // Si lo dejás en "a coordinar", el monto se acuerda por WhatsApp.
-  const VALOR_ENTREVISTA = "a coordinar";
+  // Link de reservas para la consulta profesional (arancelada). Distinto al de jubilaciones.
+  const URL_TURNO_CONSULTA = "https://calendar.app.google/cB5BDzrE5LLSq5ZW8";
 
-  const pasos = [
-    { num: '1', titulo: 'Planteás tu tema', desc: 'Nos escribís por WhatsApp y nos contás, en pocas líneas, de qué se trata tu caso.' },
-    { num: '2', titulo: 'Coordinamos la videollamada', desc: 'Acordamos día y horario, y te confirmamos el valor de la consulta.' },
-    { num: '3', titulo: 'Realizamos la consulta', desc: 'En la videollamada analizamos tu caso a fondo: viabilidad, alternativas y una estrategia concreta.' },
-    { num: '4', titulo: 'Si avanzamos juntos', desc: 'El valor de la consulta se acredita a cuenta de los honorarios. Si seguimos, la consulta no te costó nada.' },
+  const incluye = [
+    {
+      titulo: 'Tiempo dedicado a vos',
+      desc: 'Una videollamada reservada exclusivamente para tu caso, sin apuro. Llegás con dudas y te vas con un panorama claro de tu situación legal.',
+    },
+    {
+      titulo: 'Un dictamen, no una charla',
+      desc: 'Analizo la viabilidad real de tu caso, las alternativas y los riesgos para proponerte una estrategia concreta. Es trabajo profesional de análisis y, por eso, tiene un valor.',
+    },
   ];
 
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
             <Calendar className="h-3 w-3 mr-1.5" />
             CONSULTA PROFESIONAL
           </div>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 leading-tight">
             Una evaluación seria de tu caso, por videollamada.
           </h1>
           <p className="inline-flex items-center bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-full px-4 py-1.5 text-sm md:text-base font-medium mb-6">
-            Servicio arancelado · por videollamada
+            Servicio arancelado • Modalidad online
           </p>
-          <p className="text-xl md:text-2xl text-slate-300 leading-relaxed">
-            No doy opiniones legales al voleo. Reservá una consulta formal donde analizamos tu situación con tiempo, rigor y una estrategia concreta para avanzar.
+          <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto">
+            No doy opiniones legales al voleo. Reservá una consulta formal para analizar tu situación con tiempo y rigor.
           </p>
         </div>
       </section>
 
-      {/* Por qué tiene valor */}
+      {/* Qué incluye */}
       <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
-                <Clock className="h-6 w-6 text-amber-600" />
-              </div>
-              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Tiempo dedicado a vos</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Una videollamada reservada para tu caso, sin apuro. Llegás con dudas y te vas con un panorama claro de tu situación legal.
-              </p>
-            </div>
-            <div>
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
-                <Scale className="h-6 w-6 text-amber-600" />
-              </div>
-              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Un dictamen, no una charla</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Analizo la viabilidad real de tu caso, las alternativas y los riesgos, y te propongo una estrategia concreta. Es trabajo profesional, y por eso tiene un valor.
-              </p>
-            </div>
-            <div>
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
-                <CheckCircle className="h-6 w-6 text-amber-600" />
-              </div>
-              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Se acredita al trabajo</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Si después decidimos avanzar juntos, el valor de la consulta se descuenta de los honorarios. En la práctica, si seguimos, la consulta no te costó nada.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cómo funciona */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Cómo funciona</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Cuatro pasos simples, del primer mensaje a la estrategia.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {pasos.map((paso, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                <div className="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-lg mb-4">
-                  {paso.num}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-8 text-center">
+            ¿Qué incluye la consulta?
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {incluye.map((item, i) => (
+              <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 p-6">
+                <div className="flex items-center mb-3">
+                  <CheckCircle className="h-5 w-5 text-amber-600 mr-2 flex-shrink-0" />
+                  <h3 className="text-lg font-serif font-bold text-slate-900">{item.titulo}</h3>
                 </div>
-                <h3 className="font-serif font-bold text-slate-900 mb-2">{paso.titulo}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{paso.desc}</p>
+                <p className="text-slate-600 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Valor + CTA */}
-      <section className="py-16 bg-white">
+      {/* Cómo reservar */}
+      <section className="py-16 bg-slate-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 md:p-12 text-center shadow-xl">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-3">Reservá tu Consulta Profesional</h2>
-            <p className="text-slate-300 mb-8 leading-relaxed">
-              Modalidad videollamada · Valor: {VALOR_ENTREVISTA} · Se acredita a los honorarios si avanzamos juntos.
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">Reservá tu consulta</h2>
+            <p className="text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
+              Escribime por WhatsApp y contame, en pocas líneas, de qué se trata tu situación. Coordinamos el día y el horario, y te confirmo el valor de la consulta junto con los medios de pago.
             </p>
-            <a
-              href={buildWhatsAppUrl("Hola Dr. López, quiero solicitar una Consulta Profesional por videollamada. Mi tema es: ")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
-            >
-              <WhatsAppIcon className="h-6 w-6 mr-3" />
-              Pedir mi consulta por WhatsApp
-            </a>
-            <p className="text-sm text-slate-400 mt-6">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a
+                href={buildWhatsAppUrl("Hola Dr. López, quiero reservar una Consulta Profesional. Mi tema es: ")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center justify-center shadow-lg text-lg"
+              >
+                <WhatsAppIcon className="h-6 w-6 mr-3" />
+                Escribir por WhatsApp
+              </a>
+              <a
+                href={URL_TURNO_CONSULTA}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center justify-center shadow-lg text-lg"
+              >
+                <Calendar className="h-6 w-6 mr-3" />
+                Sacar turno arancelado
+              </a>
+            </div>
+            <p className="text-sm text-slate-400 mt-8">
               ¿Ya sos cliente del estudio?{" "}
               <button onClick={() => navigateTo('portal')} className="text-amber-400 hover:text-amber-300 font-medium underline">
                 Ingresá al Portal del Cliente
