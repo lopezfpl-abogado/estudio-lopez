@@ -1278,7 +1278,7 @@ const BlogListView = ({ navigateTo }) => {
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4">Blog</h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Crónicas, recuerdos y reflexiones de mi trayectoria profesional.
+            Crónicas, recuerdos, reflexiones y opiniones, dentro y fuera de lo profesional.
           </p>
         </div>
 
