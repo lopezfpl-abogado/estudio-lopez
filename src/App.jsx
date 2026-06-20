@@ -3740,12 +3740,11 @@ const App = () => {
               className="flex items-center cursor-pointer space-x-3"
               onClick={() => navigateTo('home')}
             >
-              <div className="h-12 w-12 bg-white rounded-full p-1 flex items-center justify-center">
-                <Scale className="h-7 w-7 text-slate-900" />
-              </div>
-              <span className="font-serif text-2xl font-bold tracking-tight">
-                Estudio <span className="text-amber-500">López</span>
-              </span>
+              <img
+                src="/logo-estudio-lopez.png"
+                alt="Estudio Jurídico Juan Fernando López"
+                className="h-14 w-auto"
+              />
             </div>
 
             {/* Desktop Menu */}
