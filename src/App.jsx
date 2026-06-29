@@ -3740,7 +3740,7 @@ const App = () => {
               className="flex items-center cursor-pointer space-x-3"
               onClick={() => navigateTo('home')}
             >
-              <img
+            <img
                 src="/logo-estudio-lopez.png"
                 alt="Estudio Jurídico Juan Fernando López"
                 className="h-14 w-auto"
