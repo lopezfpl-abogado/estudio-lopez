@@ -3751,7 +3751,7 @@ const App = () => {
                 </span>
                 <span className="font-display italic text-xl text-cobre-claro -mt-1">
                   Virtual
-                  </div>
+              </div>
                 </span>
             </div>
 
