@@ -3752,8 +3752,7 @@ const App = () => {
                 <span className="font-display italic text-xl text-cobre-claro -mt-1">
                   Virtual
                 </span>
-              </div>
-              />
+              </
             </div>
 
             {/* Desktop Menu */}
