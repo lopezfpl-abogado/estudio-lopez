@@ -3806,7 +3806,9 @@ const App = () => {
         {currentView === 'home' && <HomeView navigateTo={navigateTo} />}
         {currentView === 'jubilaciones' && <JubilacionesView navigateTo={navigateTo} />}
         {currentView === 'sucesiones' && <ServiceDetailView title="Sucesiones" icon={<FileText className="h-12 w-12 text-amber-600" />} body={TEXTO_SUCESIONES} navigateTo={navigateTo} showPortalAccess />}
+        {currentView === 'sucesiones' && <EtapasSucesion />}
         {currentView === 'sucesiones' && <DocumentacionSucesiones />}
+        {currentView === 'sucesiones' && <PreguntasSucesion />}
         {currentView === 'civil' && <ServiceDetailView title="Derecho Civil y Familia" icon={<Users className="h-12 w-12 text-amber-600" />} body={TEXTO_CIVIL} navigateTo={navigateTo} />}
         {currentView === 'empresas' && <AsesoramientoEmpresarialView navigateTo={navigateTo} />}
         {currentView === 'entrevista' && <EntrevistaEvaluacionView navigateTo={navigateTo} />}
@@ -3988,7 +3990,7 @@ const HomeView = ({ navigateTo }) => (
             <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600">
               <Users className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-slate-800">2. Te asesoramos</h3>
+            <h3 className="text-xl font-bold mb-3 text-slate-800">2. Te asesoro</h3>
             <p className="text-slate-600">Analizo tu caso, reviso la documentación y coordinamos una videollamada o una reunión presencial si hace falta.</p>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
@@ -4003,6 +4005,7 @@ const HomeView = ({ navigateTo }) => (
     </section>
 
     {/* Bloque destacado: Asesoramiento Empresarial */}
+    <SucesionesBanner navigateTo={navigateTo} />
     <AsesoramientoEmpresarialBanner navigateTo={navigateTo} />
     {/* Sección de Novedades del Derecho (lee de Google Sheets) */}
     <NovedadesDerechoHome navigateTo={navigateTo} />
@@ -4248,6 +4251,139 @@ const JubilacionesView = ({ navigateTo }) => {
         </div>
       </section>
     </div>
+  );
+};
+
+// ============================================================================
+// COMPONENTES DE SUCESIONES
+// ============================================================================
+
+// Bloque destacado de Sucesiones para la home
+const SucesionesBanner = ({ navigateTo }) => (
+  <section className="py-16 bg-slate-50 border-y border-slate-200">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
+        <div className="lg:col-span-3">
+          <div className="inline-flex items-center bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-4">
+            <FileText className="h-3 w-3 mr-1.5" />
+            SUCESIONES
+          </div>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4 leading-tight">
+            Ordenar una herencia, sin sumar preocupaciones a la familia.
+          </h2>
+          <p className="text-lg text-slate-600 leading-relaxed mb-8">
+            Sucesiones testamentarias e intestadas en toda la Provincia de Buenos Aires. Honorarios pactados desde la primera consulta y pago diferido al cierre cuando el caso lo permite.
+          </p>
+          <button
+            onClick={() => navigateTo('sucesiones')}
+            className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-md"
+          >
+            Ver cómo es el trámite <ArrowRight className="h-5 w-5 ml-2" />
+          </button>
+        </div>
+        <div className="lg:col-span-2">
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4 shadow-sm">
+            {[
+              'Toda la Provincia de Buenos Aires',
+              'Trámite electrónico y reuniones virtuales',
+              'Honorarios pactados por escrito',
+              'Seguimiento online del expediente',
+            ].map((t, i) => (
+              <div key={i} className="flex items-start">
+                <CheckCircle className="h-5 w-5 text-amber-500 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-700">{t}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// Etapas del trámite sucesorio
+const EtapasSucesion = () => {
+  const etapas = [
+    { titulo: 'Inicio', desc: 'Presentación ante el juzgado del último domicilio del causante, con la partida de defunción y las que acreditan el vínculo.' },
+    { titulo: 'Edictos', desc: 'Publicación que cita a herederos y acreedores para que se presenten en el expediente.' },
+    { titulo: 'Declaratoria', desc: 'El juez reconoce quiénes son los herederos o, si hay testamento, lo aprueba formalmente.' },
+    { titulo: 'Inventario', desc: 'Denuncia y valuación de los bienes; se liquidan la tasa de justicia y los aportes.' },
+    { titulo: 'Partición', desc: 'Reparto de los bienes entre los herederos, por acuerdo o, si no lo hay, judicialmente.' },
+    { titulo: 'Inscripción', desc: 'Los bienes quedan registrados a nombre de los herederos, o se transfieren a un comprador.' },
+  ];
+  return (
+    <section className="bg-slate-50 pb-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 md:p-10">
+          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Cómo es el trámite, paso a paso</h2>
+          <p className="text-slate-600 mb-8">En cada etapa te explico qué se hace y qué necesito de la familia.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {etapas.map((e, i) => (
+              <div key={i} className="bg-slate-50 rounded-lg p-5 border border-slate-100">
+                <div className="flex items-center mb-2">
+                  <div className="w-8 h-8 bg-amber-500 text-slate-900 rounded-full flex items-center justify-center font-bold text-sm mr-3 flex-shrink-0">
+                    {i + 1}
+                  </div>
+                  <h3 className="font-serif font-bold text-lg text-slate-900">{e.titulo}</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">{e.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Preguntas frecuentes sobre sucesiones (desplegables)
+const PreguntasSucesion = () => {
+  const [abierta, setAbierta] = useState(null);
+  const preguntas = [
+    {
+      q: '¿Qué gastos hay además de los honorarios?',
+      a: 'La tasa de justicia y su sobretasa, que se calculan sobre la valuación de los bienes; los aportes a la Caja de Abogados y al Colegio; la publicación de edictos, y los certificados e informes registrales. En la primera consulta te doy una estimación según tu caso.',
+    },
+    {
+      q: '¿Tienen que presentarse todos los herederos?',
+      a: 'No. Cualquier heredero puede iniciar la sucesión, pero hay que denunciar a todos los herederos conocidos. Para repartir los bienes por acuerdo sí hace falta la conformidad de todos.',
+    },
+    {
+      q: '¿Y si un heredero vive lejos o no quiere firmar?',
+      a: 'Quien vive lejos puede intervenir mediante un poder o con firma a distancia. Si no hay acuerdo entre los herederos, la partición se resuelve judicialmente.',
+    },
+    {
+      q: '¿Se puede vender un inmueble antes de terminar?',
+      a: 'Sí. Dictada la declaratoria de herederos, el inmueble puede venderse por tracto abreviado: el escribano inscribe la venta sin necesidad de inscribirlo antes a nombre de los herederos. También es posible la cesión de derechos hereditarios.',
+    },
+    {
+      q: '¿Tengo que viajar al juzgado?',
+      a: 'No. El expediente es electrónico y las reuniones pueden hacerse por videollamada. Tomo sucesiones en toda la Provincia de Buenos Aires.',
+    },
+  ];
+  return (
+    <section className="bg-white py-16 border-t border-slate-200">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-serif font-bold text-slate-900 mb-8 text-center">Preguntas frecuentes</h2>
+        <div className="divide-y divide-slate-200 border-y border-slate-200">
+          {preguntas.map((p, i) => (
+            <div key={i}>
+              <button
+                onClick={() => setAbierta(abierta === i ? null : i)}
+                className="w-full flex justify-between items-center text-left py-4 text-slate-900 font-medium hover:text-amber-700 transition-colors"
+                aria-expanded={abierta === i}
+              >
+                <span className="pr-4">{p.q}</span>
+                <ChevronRight className={`h-5 w-5 flex-shrink-0 text-amber-600 transition-transform ${abierta === i ? 'rotate-90' : ''}`} />
+              </button>
+              {abierta === i && (
+                <p className="pb-5 text-slate-600 leading-relaxed">{p.a}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
