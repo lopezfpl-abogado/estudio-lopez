@@ -446,7 +446,7 @@ const QuienSoyView = ({ navigateTo }) => {
       periodo: '1989',
       items: [
         'Abogado, Universidad Nacional de La Plata (UNLP)',
-        'Matrícula vigente en el Colegio de Abogados de Dolores desde 1989',
+        'Matrícula vigente en el Colegio de Abogados de Dolores desde 1989 (Tº II Fº 191)',
       ],
     },
     {
@@ -558,7 +558,7 @@ const QuienSoyView = ({ navigateTo }) => {
               En los últimos diez años me especialicé en algo que hoy es central para cualquier empresa: <strong>la transformación digital aplicada a la gestión administrativa</strong>. Dirigí los sistemas de Recursos Humanos para una empresa con 22.000 empleados ferroviarios, lideré un proyecto de digitalización de 500.000 legajos en guarda, y más recientemente fui Director de Atención a la Ciudadanía en la Provincia de Buenos Aires, a cargo de un equipo de 350 personas que gestionaba el centro telefónico 148, los servicios online y el chatbot de atención automática.
             </p>
             <p className="text-lg text-slate-800 leading-relaxed">
-              Esta combinación es la que define mi forma de trabajar hoy. Cuando un cliente me consulta sobre un contrato, una sucesión o un conflicto laboral, no veo solo el expediente: veo el flujo administrativo, el impacto operativo, la lógica del negocio. Cuarenta años de práctica jurídica con experiencia simultánea en gestión empresarial, función pública y digitalización me dan una visión integral que pocos asesores legales pueden ofrecer.
+              Esta combinación es la que define mi forma de trabajar hoy. Cuando un cliente me consulta sobre un contrato, una sucesión o un conflicto laboral, no veo solo el expediente: veo el flujo administrativo, el impacto operativo, la lógica del negocio. Más de treinta y cinco años de práctica jurídica con experiencia simultánea en gestión empresarial, función pública y digitalización me dan una visión integral que pocos asesores legales pueden ofrecer.
             </p>
           </div>
         </div>
@@ -593,7 +593,7 @@ const QuienSoyView = ({ navigateTo }) => {
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Mi diferencial</h2>
           </div>
           <blockquote className="text-lg md:text-xl text-slate-200 leading-relaxed italic border-l-4 border-amber-500 pl-6 mb-6">
-            No soy un abogado de despacho. Cuarenta años de práctica me llevaron por estudios privados, gremios, ministerios, directorios de empresas y proyectos de digitalización masivos. Esa diversidad me permite entender a mis clientes desde múltiples ángulos: el del expediente, el del flujo de caja, el del equipo a cargo y el del sistema administrativo que sostiene todo.
+            No soy un abogado de despacho. Más de treinta y cinco años de práctica me llevaron por estudios privados, gremios, ministerios, directorios de empresas y proyectos de digitalización masivos. Esa diversidad me permite entender a mis clientes desde múltiples ángulos: el del expediente, el del flujo de caja, el del equipo a cargo y el del sistema administrativo que sostiene todo.
           </blockquote>
           <blockquote className="text-lg md:text-xl text-slate-200 leading-relaxed italic border-l-4 border-amber-500 pl-6">
             Cuando me consultan, no doy una respuesta legal abstracta: doy una respuesta integrada al negocio o a la situación familiar concreta de quien me consulta.
@@ -3768,13 +3768,13 @@ const App = () => {
                 {/* Submenú */}
                 <div className="absolute left-0 top-full pt-3 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
                   <div className="bg-white rounded-lg shadow-xl border border-slate-200 py-2 min-w-[260px]">
-                    <button onClick={() => navigateTo('jubilaciones')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'jubilaciones' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
-                      <Clock className="h-4 w-4 mr-3 text-amber-600" />
-                      Jubilaciones
-                    </button>
                     <button onClick={() => navigateTo('sucesiones')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'sucesiones' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
                       <FileText className="h-4 w-4 mr-3 text-amber-600" />
                       Sucesiones
+                    </button>
+                    <button onClick={() => navigateTo('jubilaciones')} className={`w-full text-left px-5 py-2.5 text-sm hover:bg-amber-50 transition-colors flex items-center ${currentView === 'jubilaciones' ? 'text-amber-700 bg-amber-50 font-semibold' : 'text-slate-700'}`}>
+                      <Clock className="h-4 w-4 mr-3 text-amber-600" />
+                      Jubilaciones
                     </button>
                     {/* Civil y Familia — oculto temporalmente */}
                     <div className="border-t border-slate-100 my-1"></div>
@@ -3814,8 +3814,8 @@ const App = () => {
 
               {/* Grupo Servicios */}
               <div className="px-3 pt-3 pb-1 text-xs font-bold text-amber-500 uppercase tracking-wider">Servicios</div>
-              <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               <button onClick={() => navigateTo('sucesiones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Sucesiones</button>
+              <button onClick={() => navigateTo('jubilaciones')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Jubilaciones</button>
               {/* Civil y Familia — oculto temporalmente */}
               <button onClick={() => navigateTo('empresas')} className="block w-full text-left pl-6 pr-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Asesoramiento Empresarial</button>
 
@@ -3863,13 +3863,14 @@ const App = () => {
               <span className="font-serif text-xl font-bold text-white">Estudio <span className="text-amber-500">López</span></span>
             </div>
             <p className="text-sm">Estudio Jurídico Juan Fernando López. Más de 35 años de experiencia brindando soluciones legales, gestión de crisis y modernización digital.</p>
+            <p className="text-sm mt-3 text-slate-500">Abogado (UNLP) · Matrícula Tº II Fº 191, Colegio de Abogados de Dolores</p>
           </div>
           <div>
             <h3 className="text-white font-semibold mb-4 border-b border-slate-700 pb-2">Enlaces Rápidos</h3>
             <ul className="space-y-2 text-sm">
               <li><button onClick={() => navigateTo('home')} className="hover:text-amber-500 transition-colors">Inicio</button></li>
-              <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               <li><button onClick={() => navigateTo('sucesiones')} className="hover:text-amber-500 transition-colors">Sucesiones</button></li>
+              <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               {/* Civil y Familia — oculto temporalmente */}
               <li><button onClick={() => navigateTo('empresas')} className="hover:text-amber-500 transition-colors">Asesoramiento Empresarial</button></li>
               <li><button onClick={() => navigateTo('entrevista')} className="hover:text-amber-500 transition-colors">Consulta Profesional</button></li>
@@ -3939,25 +3940,32 @@ const HomeView = ({ navigateTo }) => (
             <div className="absolute -top-4 -right-4 bg-amber-500 text-slate-900 font-bold p-3 rounded-full shadow-lg">
               <Shield className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-semibold mb-4 border-b border-slate-700 pb-2">Estado de tu Caso</h3>
+            <h3 className="text-xl font-semibold mb-4 border-b border-slate-700 pb-2">Respaldo profesional</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center bg-slate-900 p-3 rounded-md border border-slate-700">
                 <div className="flex items-center space-x-3">
-                  <FileText className="text-amber-500 h-5 w-5" />
-                  <span className="text-sm font-medium">Sucesión #234</span>
+                  <Scale className="text-amber-500 h-5 w-5" />
+                  <span className="text-sm font-medium">Matrícula</span>
                 </div>
-                <span className="text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded-full border border-green-800">Sentencia Favorable</span>
+                <span className="text-xs text-slate-300">Tº II Fº 191 · C.A. Dolores</span>
               </div>
               <div className="flex justify-between items-center bg-slate-900 p-3 rounded-md border border-slate-700">
                 <div className="flex items-center space-x-3">
                   <Clock className="text-amber-500 h-5 w-5" />
-                  <span className="text-sm font-medium">Reajuste Jubilatorio #189</span>
+                  <span className="text-sm font-medium">Ejercicio profesional</span>
                 </div>
-                <span className="text-xs bg-blue-900/50 text-blue-400 px-2 py-1 rounded-full border border-blue-800">En trámite ANSES</span>
+                <span className="text-xs text-slate-300">Desde 1989</span>
+              </div>
+              <div className="flex justify-between items-center bg-slate-900 p-3 rounded-md border border-slate-700">
+                <div className="flex items-center space-x-3">
+                  <FileText className="text-amber-500 h-5 w-5" />
+                  <span className="text-sm font-medium">Áreas principales</span>
+                </div>
+                <span className="text-xs text-slate-300">Sucesiones · Previsional · Laboral</span>
               </div>
             </div>
             <div className="mt-6 text-center">
-              <p className="text-sm text-slate-400 italic">"Transparencia total en tiempo real."</p>
+              <p className="text-sm text-slate-400 italic">"Atención personal, de principio a fin."</p>
             </div>
           </div>
         </div>
@@ -3979,7 +3987,7 @@ const HomeView = ({ navigateTo }) => (
           </div>
           <div className="md:w-2/3">
             <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Juan Fernando López</h2>
-            <h3 className="text-xl text-amber-600 font-medium mb-4">Abogado (UNLP)</h3>
+            <h3 className="text-xl text-amber-600 font-medium mb-4">Abogado (UNLP) · Tº II Fº 191 C.A. Dolores</h3>
             <p className="text-slate-600 mb-4 text-lg">
               Con una sólida carrera iniciada en 1989, con apenas 22 años, he desarrollado mi profesión abarcando múltiples áreas.
             </p>
@@ -3995,7 +4003,7 @@ const HomeView = ({ navigateTo }) => (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">¿Cómo funciona nuestro Estudio Virtual?</h2>
+          <h2 className="text-3xl font-serif font-bold text-slate-900 mb-4">¿Cómo trabajo?</h2>
           <p className="text-slate-600 max-w-2xl mx-auto">Un proceso simple, diseñado para ahorrarte tiempo y darte tranquilidad.</p>
         </div>
 
@@ -4004,22 +4012,22 @@ const HomeView = ({ navigateTo }) => (
             <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
               <WhatsAppIcon className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-slate-800">1. Escribinos</h3>
-            <p className="text-slate-600">Tocá el botón verde de WhatsApp y contanos brevemente tu caso. Te respondemos en horario de atención.</p>
+            <h3 className="text-xl font-bold mb-3 text-slate-800">1. Escribime</h3>
+            <p className="text-slate-600">Tocá el botón verde de WhatsApp y contame brevemente tu caso. Te respondo personalmente en horario de atención.</p>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600">
               <Users className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-slate-800">2. Te asesoramos</h3>
-            <p className="text-slate-600">Analizamos tu caso, revisamos la documentación y coordinamos una videollamada o reunión presencial si hace falta.</p>
+            <p className="text-slate-600">Analizo tu caso, reviso la documentación y coordinamos una videollamada o una reunión presencial si hace falta.</p>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-600">
               <Clock className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-slate-800">3. Seguís todo online</h3>
-            <p className="text-slate-600">Acceso 24/7 al Portal del Cliente para ver avances, firmar documentos y consultar al equipo.</p>
+            <p className="text-slate-600">Desde el Portal del Cliente podés consultar en cualquier momento el estado de tu trámite y sus novedades.</p>
           </div>
         </div>
       </div>
