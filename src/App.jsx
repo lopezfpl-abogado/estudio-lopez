@@ -129,20 +129,20 @@ const AsesoramientoEmpresarialBanner = ({ navigateTo }) => {
               Asesoramiento jurídico permanente para empresas, PyMEs y emprendedores que entienden que la prevención no es gasto: es inversión.
             </p>
             <p className="text-base text-slate-400 leading-relaxed mb-8">
-              Trabajo mediante un sistema de <strong className="text-amber-400">Abono Mensual</strong> adaptado a la escala de tu empresa, con disponibilidad inmediata, prioridad de atención y costos previsibles.
+              Trabajo mediante un sistema de <strong className="text-amber-400">Abono Mensual</strong> adaptado a la escala de tu empresa, con atención personal y costos previsibles.
             </p>
             <button
               onClick={() => navigateTo('empresas')}
               className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-md transition-colors inline-flex items-center shadow-lg"
             >
-              Conocer los planes <ArrowRight className="h-5 w-5 ml-2" />
+              Conocer el servicio <ArrowRight className="h-5 w-5 ml-2" />
             </button>
           </div>
           <div className="lg:col-span-2">
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 space-y-4">
               <div className="flex items-start">
                 <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-slate-200"><strong className="text-white">Disponibilidad real</strong> por WhatsApp y email todos los días</p>
+                <p className="text-sm text-slate-200"><strong className="text-white">Atención directa</strong> por WhatsApp y email</p>
               </div>
               <div className="flex items-start">
                 <CheckCircle className="h-5 w-5 text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
@@ -254,9 +254,9 @@ const AsesoramientoEmpresarialView = ({ navigateTo }) => {
               <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
                 <Clock className="h-6 w-6 text-amber-600" />
               </div>
-              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Disponibilidad real, costo previsible</h3>
+              <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Atención directa, costo previsible</h3>
               <p className="text-slate-600 leading-relaxed">
-                Sistema de Abono Mensual adaptado a la escala de tu empresa: disponibilidad inmediata, prioridad de atención y costos previsibles, sin sorpresas en la facturación.
+                Sistema de Abono Mensual adaptado a la escala de tu empresa: atención personal, respuesta en horario de atención y costos previsibles, sin sorpresas en la facturación.
               </p>
             </div>
           </div>
@@ -307,60 +307,29 @@ const AsesoramientoEmpresarialView = ({ navigateTo }) => {
         </div>
       </section>
 
-      {/* 3 Planes */}
+      {/* Plan único */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Tres planes, una sola lógica</h2>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-3">Un plan, adaptado a tu empresa</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Elegí el plan que mejor se adapta a la escala de tu empresa. Honorarios cotizados caso por caso.
+              Honorarios cotizados según la escala de cada empresa. Trabajo con un número limitado de empresas para asegurar atención personal.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-6 items-start pt-6">
+          <div className="max-w-md mx-auto">
             <PlanCard
-              plan={{ tag: 'EMPRENDEDOR', nombre: 'Plan Emprendedor', descripcion: 'Para monotributistas y empresas hasta 5 empleados' }}
-              color="green"
+              plan={{ tag: 'ABONO MENSUAL', nombre: 'Abono Empresarial', descripcion: 'Para emprendedores y PyMEs' }}
+              color="blue"
               destacado={false}
               items={[
-                'Consultas <strong>ilimitadas</strong> por WhatsApp y email',
-                'Revisión de hasta <strong>2 contratos por mes</strong>',
-                'Atención de intimaciones y cartas documento',
-                'Asesoramiento laboral preventivo básico',
-                '<strong>1 reunión virtual mensual</strong> de seguimiento',
+                'Consultas por WhatsApp y email en horario de atención',
+                'Revisión de contratos y cartas documento',
+                'Asesoramiento laboral preventivo',
+                '<strong>Reunión mensual</strong> de seguimiento, virtual o presencial',
                 'Tarifa preferencial para juicios y trámites mayores',
               ]}
-              mensaje="Hola Dr. López, me interesa el Plan Emprendedor para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
-            />
-            <PlanCard
-              plan={{ tag: 'PYME', nombre: 'Plan PyME', descripcion: 'Para empresas de 6 a 25 empleados con operación regular' }}
-              color="blue"
-              destacado={true}
-              items={[
-                'Todo lo del Plan Emprendedor, <strong>más</strong>:',
-                'Revisión y redacción de contratos <strong>sin límite mensual</strong>',
-                'Asistencia ante inspecciones de AFIP, ARBA, Min. Trabajo y municipios',
-                'Redacción de actas de directorio y asambleas (SRL/SA)',
-                'Acompañamiento en negociaciones con proveedores y clientes',
-                '<strong>Reunión presencial o virtual quincenal</strong>',
-                'Auditoría legal preventiva <strong>semestral</strong>',
-              ]}
-              mensaje="Hola Dr. López, me interesa el Plan PyME para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
-            />
-            <PlanCard
-              plan={{ tag: 'CORPORATE', nombre: 'Plan Corporate', descripcion: 'Para empresas con más de 25 empleados o múltiples sociedades' }}
-              color="violet"
-              destacado={false}
-              items={[
-                'Todo lo del Plan PyME, <strong>más</strong>:',
-                'Asesoramiento estratégico para <strong>alta dirección</strong>',
-                'Atención prioritaria <strong>24/7</strong> ante urgencias',
-                'Auditoría legal preventiva <strong>trimestral</strong>',
-                'Soporte en procesos de digitalización y modernización',
-                'Representación en directorios y asambleas',
-                'Coordinación con auditores externos y contadores',
-              ]}
-              mensaje="Hola Dr. López, me interesa el Plan Corporate para Asesoramiento Empresarial. ¿Podemos coordinar una reunión?"
+              mensaje="Hola Dr. López, me interesa el Abono Empresarial. ¿Podemos coordinar una reunión?"
             />
           </div>
         </div>
