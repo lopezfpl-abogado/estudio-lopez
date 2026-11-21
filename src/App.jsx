@@ -3886,10 +3886,10 @@ const HomeView = ({ navigateTo }) => (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 relative z-10 flex flex-col md:flex-row items-center">
         <div className="md:w-3/5 md:pr-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6">
-            Experiencia, liderazgo y <span className="text-amber-500 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">soluciones legales integrales.</span>
+            Trayectoria, criterio y <span className="text-amber-500 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">trato directo.</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl">
-            Soy Juan Fernando López, abogado con más de 35 años de trayectoria. Me formé con el expediente en papel y hoy trabajo con las herramientas de esta época para resolver tus problemas legales y gestionar trámites evitando demoras, optimizando tu tiempo y manteniéndote informado.
+            Soy Juan Fernando López, abogado. Más de 35 años de oficio, con las herramientas de hoy. Atención personal, sin intermediarios.
           </p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <a
