@@ -91,7 +91,7 @@ const TEXTO_JUBILACIONES = `En Argentina, gestionar tu jubilación o defender el
 
 Te acompaño en el inicio de la jubilación ordinaria, por edad avanzada o por invalidez; en el reajuste de haberes y los reclamos por movilidad jubilatoria mal aplicada; en pensiones por fallecimiento y derecho de pensión de cónyuges, convivientes e hijos; en el reconocimiento de servicios prestados —incluso de períodos sin aportes registrados—; en regímenes diferenciales y especiales, como docentes o trabajadores insalubres; y en recursos administrativos y demandas judiciales contra ANSES.
 
-Todo el trámite se gestiona de forma online a través del Portal del Cliente: tomás tu turno por videollamada, firmás digitalmente y seguís el avance del expediente sin moverte de tu casa.`;
+Todo el trámite se gestiona de forma online: me escribís por WhatsApp, coordinamos una videollamada si hace falta, firmás digitalmente y seguís el avance del expediente desde el Portal del Cliente, sin moverte de tu casa.`;
 
 const TEXTO_SUCESIONES = `Una sucesión es uno de los trámites más sensibles que enfrenta una familia: combina el dolor de una pérdida con la urgencia de poner orden en patrimonios, papeles y plazos. Mi trabajo es despejar ese laberinto, explicarte en cada etapa qué corresponde hacer, y avanzar con celeridad para que la herencia se transmita sin demoras innecesarias.
 
@@ -256,7 +256,7 @@ const AsesoramientoEmpresarialView = ({ navigateTo }) => {
               </div>
               <h3 className="text-xl font-serif font-bold text-slate-900 mb-3">Atención directa, costo previsible</h3>
               <p className="text-slate-600 leading-relaxed">
-                Sistema de Abono Mensual adaptado a la escala de tu empresa: atención personal, respuesta en horario de atención y costos previsibles, sin sorpresas en la facturación.
+                Sistema de Abono Mensual adaptado a la escala de tu empresa: atención personal, respuesta en el día hábil y costos previsibles, sin sorpresas en la facturación.
               </p>
             </div>
           </div>
@@ -323,7 +323,7 @@ const AsesoramientoEmpresarialView = ({ navigateTo }) => {
               color="blue"
               destacado={false}
               items={[
-                'Consultas por WhatsApp y email en horario de atención',
+                'Consultas por WhatsApp y email, con respuesta personal en el día hábil',
                 'Revisión de contratos y cartas documento',
                 'Asesoramiento laboral preventivo',
                 '<strong>Reunión mensual</strong> de seguimiento, virtual o presencial',
@@ -575,15 +575,17 @@ const QuienSoyView = ({ navigateTo }) => {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3">¿Querés que evaluemos tu caso?</h2>
           <p className="text-slate-700 mb-8 leading-relaxed">
-            Las consultas se realizan mediante una Consulta Profesional por videollamada. Pedila y coordinamos día y horario.
+            Escribime por WhatsApp y contame brevemente tu situación. Si me escribís un día hábil antes de las 14 hs, te contesto ese mismo día; si no, el día hábil siguiente.
           </p>
-          <button
-            onClick={() => navigateTo('entrevista')}
-            className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
+          <a
+            href={buildWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 hover:bg-green-600 text-white font-medium px-8 py-4 rounded-md transition-colors inline-flex items-center shadow-lg text-lg"
           >
-            <Calendar className="h-6 w-6 mr-3" />
-            Pedí tu Consulta Profesional
-          </button>
+            <WhatsAppIcon className="h-6 w-6 mr-3" />
+            Consultar por WhatsApp
+          </a>
         </div>
       </section>
     </div>
@@ -2049,9 +2051,9 @@ const ContactoView = () => {
               <div className="flex items-start">
                 <Clock className="h-6 w-6 text-amber-600 mr-3 mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="font-serif font-bold text-slate-900 mb-2">Horario de atención</h3>
+                  <h3 className="font-serif font-bold text-slate-900 mb-2">Cuándo respondo</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    Respondo en horario hábil: <strong>lunes a viernes, 9 a 18hs</strong>. Si me escribís fuera de horario, te contesto al día siguiente.
+                    Respondo personalmente cada mensaje. Si me escribís un día hábil <strong>antes de las 14 hs</strong>, te contesto ese mismo día; si no, el día hábil siguiente.
                   </p>
                 </div>
               </div>
@@ -3620,7 +3622,7 @@ const App = () => {
     'sucesiones': '/sucesiones',
     'civil': '/civil-y-familia',
     'empresas': '/empresas',
-    'entrevista': '/consulta-profesional',
+    'entrevista': '/como-trabajo',
     'quien-soy': '/quien-soy',
     'novedades': '/novedades',
     'novedad-post': '/novedades',
@@ -3647,7 +3649,7 @@ const App = () => {
     if (first === 'sucesiones') return { view: 'sucesiones', slug: null };
     if (first === 'civil-y-familia' || first === 'civil') return { view: 'civil', slug: null };
     if (first === 'empresas') return { view: 'empresas', slug: null };
-    if (first === 'consulta-profesional' || first === 'entrevista') return { view: 'entrevista', slug: null };
+    if (first === 'como-trabajo' || first === 'consulta-profesional' || first === 'entrevista') return { view: 'entrevista', slug: null };
     if (first === 'quien-soy') return { view: 'quien-soy', slug: null };
     if (first === 'portal') return { view: 'portal', slug: null };
     if (first === 'contacto') return { view: 'contacto', slug: null };
@@ -3759,7 +3761,7 @@ const App = () => {
               <button onClick={() => navigateTo('novedades')} className={`hover:text-amber-400 transition-colors ${(currentView === 'novedades' || currentView === 'novedad-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Novedades</button>
               <button onClick={() => navigateTo('blog')} className={`hover:text-amber-400 transition-colors ${(currentView === 'blog' || currentView === 'blog-post') ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Blog</button>
               <button onClick={() => navigateTo('contacto')} className={`hover:text-amber-400 transition-colors ${currentView === 'contacto' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Contacto</button>
-              <button onClick={() => navigateTo('entrevista')} className={`px-4 py-2 rounded-md font-semibold transition-colors ${currentView === 'entrevista' ? 'bg-amber-600 text-slate-900' : 'bg-amber-500 hover:bg-amber-600 text-slate-900'}`}>Consulta Profesional</button>
+              <button onClick={() => navigateTo('entrevista')} className={`px-4 py-2 rounded-md font-semibold transition-colors ${currentView === 'entrevista' ? 'bg-amber-600 text-slate-900' : 'bg-amber-500 hover:bg-amber-600 text-slate-900'}`}>Cómo trabajo</button>
               <button onClick={() => navigateTo('portal')} className={`hover:text-amber-400 transition-colors ${currentView === 'portal' ? 'text-amber-500 border-b-2 border-amber-500' : ''}`}>Portal del Cliente</button>
             </nav>
 
@@ -3794,7 +3796,7 @@ const App = () => {
               <button onClick={() => navigateTo('novedades')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Novedades</button>
               <button onClick={() => navigateTo('blog')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Blog</button>
               <button onClick={() => navigateTo('contacto')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Contacto</button>
-              <button onClick={() => navigateTo('entrevista')} className="block w-full text-left px-3 py-2 text-base font-semibold text-amber-400 hover:bg-slate-700 rounded-md">Consulta Profesional</button>
+              <button onClick={() => navigateTo('entrevista')} className="block w-full text-left px-3 py-2 text-base font-semibold text-amber-400 hover:bg-slate-700 rounded-md">Cómo trabajo</button>
               <button onClick={() => navigateTo('portal')} className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-slate-700 rounded-md">Portal del Cliente</button>
             </div>
           </div>
@@ -3822,7 +3824,6 @@ const App = () => {
         {currentView === 'contacto' && <ContactoView />}
         {currentView === 'portal' && <ClientPortalView />}
         {currentView === 'equipo' && <TeamView />}
-        {currentView === 'contact' && <ContactView />}
       </main>
 
       {/* Footer */}
@@ -3844,7 +3845,7 @@ const App = () => {
               <li><button onClick={() => navigateTo('jubilaciones')} className="hover:text-amber-500 transition-colors">Jubilaciones</button></li>
               {/* Civil y Familia — oculto temporalmente */}
               <li><button onClick={() => navigateTo('empresas')} className="hover:text-amber-500 transition-colors">Asesoramiento Empresarial</button></li>
-              <li><button onClick={() => navigateTo('entrevista')} className="hover:text-amber-500 transition-colors">Consulta Profesional</button></li>
+              <li><button onClick={() => navigateTo('entrevista')} className="hover:text-amber-500 transition-colors">Cómo trabajo</button></li>
               <li><button onClick={() => navigateTo('quien-soy')} className="hover:text-amber-500 transition-colors">Quién soy</button></li>
               <li><button onClick={() => navigateTo('novedades')} className="hover:text-amber-500 transition-colors">Novedades del Derecho</button></li>
               <li><button onClick={() => navigateTo('blog')} className="hover:text-amber-500 transition-colors">Blog</button></li>
@@ -3888,16 +3889,18 @@ const HomeView = ({ navigateTo }) => (
             Experiencia, liderazgo y <span className="text-amber-500 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">soluciones legales integrales.</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-2xl">
-            Soy Juan Fernando López, abogado con más de 35 años de trayectoria. Combino el sólido ejercicio del derecho con la modernización digital para resolver tus problemas legales y gestionar trámites evitando demoras, optimizando tu tiempo y manteniéndote informado.
+            Soy Juan Fernando López, abogado con más de 35 años de trayectoria. Me formé con el expediente en papel y hoy trabajo con las herramientas de esta época para resolver tus problemas legales y gestionar trámites evitando demoras, optimizando tu tiempo y manteniéndote informado.
           </p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <button
-              onClick={() => navigateTo('entrevista')}
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center shadow-lg ring-4 ring-amber-500/20"
+            <a
+              href={buildWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center shadow-lg ring-4 ring-green-500/20"
             >
-              <Calendar className="h-6 w-6 mr-2" />
-              Pedí tu Consulta Profesional
-            </button>
+              <WhatsAppIcon className="h-6 w-6 mr-2" />
+              Consultar por WhatsApp
+            </a>
             <button
               onClick={() => navigateTo('portal')}
               className="bg-transparent border border-slate-500 hover:bg-slate-800 text-white px-8 py-3 rounded-md font-medium text-lg transition-all flex items-center justify-center"
@@ -3984,7 +3987,7 @@ const HomeView = ({ navigateTo }) => (
               <WhatsAppIcon className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-bold mb-3 text-slate-800">1. Escribime</h3>
-            <p className="text-slate-600">Tocá el botón verde de WhatsApp y contame brevemente tu caso. Te respondo personalmente en horario de atención.</p>
+            <p className="text-slate-600">Tocá el botón verde de WhatsApp y contame brevemente tu caso. Te respondo personalmente: en el día, si me escribís un día hábil antes de las 14 hs; si no, el día hábil siguiente.</p>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600">
@@ -4012,20 +4015,42 @@ const HomeView = ({ navigateTo }) => (
   </div>
 );
 
+// ============================================================================
+// CÓMO TRABAJO (reemplaza a la antigua página "Consulta Profesional")
+// Ruta: /como-trabajo (también responde /consulta-profesional y /entrevista)
+// ============================================================================
 const EntrevistaEvaluacionView = ({ navigateTo }) => {
-  // Link de reservas para la consulta profesional (arancelada). Distinto al de jubilaciones.
-  const URL_TURNO_CONSULTA = "https://calendar.app.google/cB5BDzrE5LLSq5ZW8";
-
-  const incluye = [
+  const principios = [
     {
-      titulo: 'Tiempo dedicado a vos',
-      desc: 'Una videollamada reservada exclusivamente para tu caso, sin apuro. Llegás con dudas y te vas con un panorama claro de tu situación legal.',
+      icon: <WhatsAppIcon className="h-6 w-6 text-green-600" />,
+      titulo: 'Atención personal',
+      desc: 'Cada consulta la leo y la respondo yo. No hay contestadores automáticos ni intermediarios. Si el caso lo requiere, coordinamos una videollamada por Meet.',
     },
     {
-      titulo: 'Un dictamen, no una charla',
-      desc: 'Analizo la viabilidad real de tu caso, las alternativas y los riesgos para proponerte una estrategia concreta. Es trabajo profesional de análisis y, por eso, tiene un valor.',
+      icon: <Shield className="h-6 w-6 text-amber-600" />,
+      titulo: 'Confidencialidad',
+      desc: 'Tu información está protegida por el secreto profesional. Uso las herramientas digitales con ese mismo resguardo.',
+    },
+    {
+      icon: <Users className="h-6 w-6 text-amber-600" />,
+      titulo: 'Discreción',
+      desc: 'No uso redes sociales ni miro estados de WhatsApp. Sé de mis clientes lo que hace falta para su asunto, nada más.',
     },
   ];
+
+  const desarrollos = [
+    {
+      titulo: 'Portal del estudio',
+      desc: 'Sistema propio para gestionar cada caso y resguardar su documentación de forma ordenada y segura.',
+    },
+    {
+      titulo: 'Captura Pro',
+      desc: 'Registra las páginas oficiales con constancia de fecha y origen, para que la información que respalda tu caso quede documentada.',
+    },
+  ];
+
+  const herramientasIA = ['Claude', 'Gemini', 'NotebookLM'];
+  const herramientasGestion = ['Google Drive', 'Docs', 'Sheets', 'Forms', 'Jotform', 'Canva'];
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -4033,69 +4058,105 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 md:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center bg-amber-500/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full mb-4">
-            <Calendar className="h-3 w-3 mr-1.5" />
-            CONSULTA PROFESIONAL
+            <Scale className="h-3 w-3 mr-1.5" />
+            CÓMO TRABAJO
           </div>
           <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 leading-tight">
-            Una evaluación seria de tu caso, por videollamada.
+            Del otro lado, siempre una persona.
           </h1>
-          <p className="inline-flex items-center bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-full px-4 py-1.5 text-sm md:text-base font-medium mb-6">
-            Servicio arancelado • Modalidad online
-          </p>
           <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            No doy opiniones legales al voleo. Reservá una consulta formal para analizar tu situación con tiempo y rigor.
+            Me formé con el expediente en papel y hoy trabajo con las herramientas de esta época. Las uso para trabajar en tu caso, no para atenderte: la relación con vos es siempre directa.
           </p>
         </div>
       </section>
 
-      {/* Qué incluye */}
+      {/* Principios */}
       <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-8 text-center">
-            ¿Qué incluye la consulta?
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {incluye.map((item, i) => (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-6">
+            {principios.map((p, i) => (
               <div key={i} className="bg-slate-50 rounded-xl border border-slate-200 p-6">
-                <div className="flex items-center mb-3">
-                  <CheckCircle className="h-5 w-5 text-amber-600 mr-2 flex-shrink-0" />
-                  <h3 className="text-lg font-serif font-bold text-slate-900">{item.titulo}</h3>
+                <div className="bg-white rounded-lg w-11 h-11 flex items-center justify-center mb-4 border border-slate-200">
+                  {p.icon}
                 </div>
-                <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg font-serif font-bold text-slate-900 mb-2">{p.titulo}</h3>
+                <p className="text-slate-600 leading-relaxed">{p.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Cómo reservar */}
+      {/* Herramientas para el trabajo */}
       <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-3 text-center">
+            Herramientas para el trabajo, no para la atención
+          </h2>
+          <p className="text-slate-600 text-center mb-10">
+            Para hablar con vos: <strong>WhatsApp</strong> y <strong>Meet</strong>. Para trabajar en tu caso:
+          </p>
+
+          {/* Desarrollos propios (destacados) */}
+          <p className="text-xs font-bold tracking-wider text-amber-700 uppercase mb-3">Desarrollos propios</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-10">
+            {desarrollos.map((d, i) => (
+              <div key={i} className="bg-white rounded-2xl border-2 border-amber-200 shadow-sm p-7">
+                <div className="flex items-center mb-3">
+                  <FileText className="h-6 w-6 text-amber-600 mr-2 flex-shrink-0" />
+                  <h3 className="text-xl font-serif font-bold text-slate-900">{d.titulo}</h3>
+                </div>
+                <p className="text-slate-600 leading-relaxed">{d.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Herramientas de apoyo */}
+          <p className="text-xs font-bold tracking-wider text-slate-500 uppercase mb-3">Herramientas de apoyo</p>
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Uso inteligencia artificial y gestión digital de documentos para analizar, redactar y ordenar tu caso.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {herramientasIA.map((h) => (
+                <span key={h} className="text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-full px-3 py-1">{h}</span>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {herramientasGestion.map((h) => (
+                <span key={h} className="text-sm text-slate-600 bg-white border border-slate-200 rounded-full px-3 py-1">{h}</span>
+              ))}
+            </div>
+          </div>
+          <p className="text-xs text-slate-400 mt-4 text-center">
+            Las marcas mencionadas pertenecen a sus respectivos titulares. Su mención no implica vínculo comercial.
+          </p>
+        </div>
+      </section>
+
+      {/* Cómo consultar */}
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 md:p-12 text-center shadow-xl">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">Reservá tu consulta</h2>
-            <p className="text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
-              Escribime por WhatsApp y contame, en pocas líneas, de qué se trata tu situación. Coordinamos el día y el horario, y te confirmo el valor de la consulta junto con los medios de pago.
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">¿Cómo consultarme?</h2>
+            <p className="text-slate-300 leading-relaxed mb-3 max-w-2xl mx-auto">
+              Escribime por WhatsApp y contame, en pocas líneas, de qué se trata tu situación. Respondo personalmente cada mensaje.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a
-                href={buildWhatsAppUrl("Hola Dr. López, quiero reservar una Consulta Profesional. Mi tema es: ")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center justify-center shadow-lg text-lg"
-              >
-                <WhatsAppIcon className="h-6 w-6 mr-3" />
-                Escribir por WhatsApp
-              </a>
-              <a
-                href={URL_TURNO_CONSULTA}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center justify-center shadow-lg text-lg"
-              >
-                <Calendar className="h-6 w-6 mr-3" />
-                Sacar turno arancelado
-              </a>
-            </div>
+            <p className="text-amber-300 font-medium mb-3 max-w-2xl mx-auto">
+              Si me escribís un día hábil antes de las 14 hs, te contesto ese mismo día; si no, el día hábil siguiente.
+            </p>
+            <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-2xl mx-auto">
+              Si tu caso necesita un análisis profesional en profundidad, te lo indico y te informo su valor antes de avanzar.
+            </p>
+            <a
+              href={buildWhatsAppUrl("Hola Dr. López, quería hacerle una consulta. Mi tema es: ")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-md transition-colors inline-flex items-center justify-center shadow-lg text-lg"
+            >
+              <WhatsAppIcon className="h-6 w-6 mr-3" />
+              Escribir por WhatsApp
+            </a>
             <p className="text-sm text-slate-400 mt-8">
               ¿Ya sos cliente del estudio?{" "}
               <button onClick={() => navigateTo('portal')} className="text-amber-400 hover:text-amber-300 font-medium underline">
@@ -4109,9 +4170,6 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
   );
 };
 
-// URL de la turnera web. Cambiá esta dirección por la real cuando publiques la turnera.
-const URL_TURNERA = "https://calendar.app.google/431EkFXRA8kHyFPM6";
-
 const JubilacionesView = ({ navigateTo }) => {
   const fortalezas = [
     {
@@ -4122,7 +4180,7 @@ const JubilacionesView = ({ navigateTo }) => {
     {
       icon: <Send className="h-6 w-6 text-amber-600" />,
       titulo: 'Gestión tecnológica avanzada',
-      desc: 'El sistema es digital, y yo también. Utilizo las herramientas más modernas para acelerar la presentación de tus documentos, hacer seguimientos en tiempo real y evitar que tu trámite quede archivado en el olvido de una plataforma.',
+      desc: 'El sistema es digital y yo trabajo con él todos los días. Utilizo herramientas actuales para acelerar la presentación de tus documentos, hacer seguimientos en tiempo real y evitar que tu trámite quede archivado en el olvido de una plataforma.',
     },
     {
       icon: <Shield className="h-6 w-6 text-amber-600" />,
@@ -4187,11 +4245,11 @@ const JubilacionesView = ({ navigateTo }) => {
           <div className="text-center">
             <h2 className="text-3xl font-serif font-bold text-slate-900 mb-3">Empezar es muy simple</h2>
             <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Ya diste el paso más importante; ahora dejá el resto en mis manos. No tenés que llenar formularios largos ni entender de sistemas complejos. Elegí la opción que te quede más cómoda:
+              Ya diste el paso más importante; ahora dejá el resto en mis manos. No tenés que llenar formularios largos ni entender de sistemas complejos. Escribime por WhatsApp. Si me escribís un día hábil antes de las 14 hs, te contesto ese mismo día; si no, el día hábil siguiente.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mt-10">
+          <div className="max-w-xl mx-auto mt-10">
             {/* Opción WhatsApp */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col">
               <div className="flex items-center mb-3">
@@ -4201,7 +4259,7 @@ const JubilacionesView = ({ navigateTo }) => {
                 <h3 className="text-xl font-serif font-bold text-slate-900">Hablamos ahora por WhatsApp</h3>
               </div>
               <p className="text-slate-600 leading-relaxed mb-6 flex-grow">
-                Si preferís contarme tu situación directamente o sacarte una duda rápida, escribime. Te atiende una persona real, no un robot de respuestas automáticas.
+                Contame tu situación o sacate una duda: escribime. Te atiende una persona real, no un robot de respuestas automáticas.
               </p>
               <a
                 href={buildWhatsAppUrl("Hola Dr. López, quería hacerle una consulta sobre jubilaciones.")}
@@ -4214,27 +4272,6 @@ const JubilacionesView = ({ navigateTo }) => {
               </a>
             </div>
 
-            {/* Opción Turno */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex flex-col">
-              <div className="flex items-center mb-3">
-                <div className="bg-amber-50 rounded-lg w-11 h-11 flex items-center justify-center mr-3">
-                  <Calendar className="h-6 w-6 text-amber-600" />
-                </div>
-                <h3 className="text-xl font-serif font-bold text-slate-900">Reservá tu turno en el calendario</h3>
-              </div>
-              <p className="text-slate-600 leading-relaxed mb-6 flex-grow">
-                Si preferís organizar tu día y asegurarte un momento exclusivo para analizar tu caso (por teléfono o videollamada), elegí el día y la hora que te convengan.
-              </p>
-              <a
-                href={URL_TURNERA}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium px-6 py-3 rounded-md transition-colors inline-flex items-center justify-center shadow-md"
-              >
-                <Calendar className="h-5 w-5 mr-2" />
-                Elegir día y hora
-              </a>
-            </div>
           </div>
 
           {/* Acceso al portal */}
@@ -4490,7 +4527,7 @@ const DocumentacionSucesiones = () => {
   );
 };
 
-const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess, urlTurnera }) => {
+const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess }) => {
   const paragraphs = body.split('\n\n');
   return (
     <div className="py-16 bg-slate-50 min-h-[60vh]">
@@ -4518,17 +4555,6 @@ const ServiceDetailView = ({ title, icon, body, navigateTo, showPortalAccess, ur
             <WhatsAppIcon className="h-5 w-5 mr-2" />
             Consultar por WhatsApp
           </a>
-          {urlTurnera && (
-            <a
-              href={urlTurnera}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-md font-medium text-lg transition-all inline-flex items-center shadow-md"
-            >
-              <Calendar className="h-5 w-5 mr-2" />
-              Sacar un turno
-            </a>
-          )}
         </div>
         {showPortalAccess && (
           <div className="mt-6 text-center">
@@ -5040,329 +5066,6 @@ const ClientPortalView = () => {
         <div className="mt-6 text-center text-xs text-slate-500 flex items-center justify-center">
           <Shield className="h-3 w-3 mr-1.5" />
           Portal seguro · Toda la información está protegida por el secreto profesional
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ContactView = () => {
-  // ===========================================================================
-  // CONFIGURACIÓN: pegá acá tu endpoint de Formspree después de registrarte
-  // ===========================================================================
-  // 1) Andá a https://formspree.io y registrate con tu email lopezf.pl@gmail.com
-  // 2) Creá un nuevo formulario (botón "+ New Form")
-  // 3) Copiá la URL del endpoint (ej: https://formspree.io/f/abcd1234)
-  // 4) Pegala acá abajo reemplazando "YOUR_FORM_ID":
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
-  // ===========================================================================
-
-  const WHATSAPP_NUMBER = "5492216180192";
-  const EMAIL_DESTINO = "lopezf.pl@gmail.com";
-
-  const [submitted, setSubmitted] = useState(false);
-  const [submittedVia, setSubmittedVia] = useState("");
-  const [error, setError] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    telefono: "",
-    email: "",
-    area: "",
-    descripcion: "",
-  });
-
-  const handleChange = (field) => (e) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-  };
-
-  const validate = () => {
-    if (!formData.nombre.trim()) return "Por favor, ingresá tu nombre y apellido.";
-    if (!formData.telefono.trim()) return "Por favor, ingresá tu teléfono.";
-    if (!formData.email.trim()) return "Por favor, ingresá tu correo electrónico.";
-    if (!/\S+@\S+\.\S+/.test(formData.email)) return "El correo electrónico no parece válido.";
-    if (!formData.descripcion.trim()) return "Por favor, describí brevemente tu consulta.";
-    return "";
-  };
-
-  const buildMessage = () => {
-    const lines = [
-      "Hola Dr. López, le escribo para solicitar una consulta a través del sitio.",
-      "",
-      "Nombre: " + formData.nombre,
-      "Teléfono / WhatsApp: " + formData.telefono,
-      "Email: " + formData.email,
-    ];
-    if (formData.area && !formData.area.startsWith("Selecciona")) {
-      lines.push("Área de interés: " + formData.area);
-    }
-    lines.push("");
-    lines.push("Consulta:");
-    lines.push(formData.descripcion);
-    return lines.join("\n");
-  };
-
-  const handleAutoSubmit = async () => {
-    const err = validate();
-    if (err) { setError(err); return; }
-
-    if (FORMSPREE_ENDPOINT.includes("YOUR_FORM_ID")) {
-      setError("El envío automático todavía no está configurado. Por favor, usá WhatsApp o Email mientras tanto.");
-      return;
-    }
-
-    setError("");
-    setIsSending(true);
-    try {
-      const response = await fetch(FORMSPREE_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: formData.nombre,
-          telefono: formData.telefono,
-          email: formData.email,
-          area: formData.area || "(no especificada)",
-          descripcion: formData.descripcion,
-          _subject: "Consulta web - " + formData.nombre,
-          _replyto: formData.email,
-        }),
-      });
-      if (response.ok) {
-        setSubmittedVia("auto");
-        setSubmitted(true);
-      } else {
-        setError("Hubo un problema al enviar tu consulta. Probá con WhatsApp o Email, o intentá de nuevo en unos minutos.");
-      }
-    } catch (e) {
-      setError("No pudimos conectar con el servidor. Probá con WhatsApp o Email.");
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleWhatsApp = () => {
-    const err = validate();
-    if (err) { setError(err); return; }
-    setError("");
-    const msg = encodeURIComponent(buildMessage());
-    window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg, "_blank");
-    setSubmittedVia("whatsapp");
-    setSubmitted(true);
-  };
-
-  const handleEmail = () => {
-    const err = validate();
-    if (err) { setError(err); return; }
-    setError("");
-    const subject = encodeURIComponent("Consulta web - " + formData.nombre);
-    const body = encodeURIComponent(buildMessage());
-    window.location.href = "mailto:" + EMAIL_DESTINO + "?subject=" + subject + "&body=" + body;
-    setSubmittedVia("email");
-    setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    setSubmitted(false);
-    setSubmittedVia("");
-    setError("");
-    setFormData({ nombre: "", telefono: "", email: "", area: "", descripcion: "" });
-  };
-
-  if (submitted) {
-    let title = "";
-    let message = "";
-    if (submittedVia === "auto") {
-      title = "¡Consulta enviada!";
-      message = "Recibimos tu consulta correctamente. Te respondemos en horario de atención (lunes a viernes, 9 a 18hs).";
-    } else if (submittedVia === "whatsapp") {
-      title = "¡Mensaje preparado!";
-      message = "Tu consulta quedó cargada en WhatsApp con todos tus datos. Solo te falta tocar \"Enviar\" en la app para que llegue al estudio.";
-    } else {
-      title = "¡Mensaje preparado!";
-      message = "Tu consulta quedó cargada en tu cliente de email. Solo te falta tocar \"Enviar\" para que llegue al estudio.";
-    }
-
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-100 text-center max-w-md w-full">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-10 w-10 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">{title}</h2>
-          <p className="text-slate-600 mb-6">{message}</p>
-          <button
-            onClick={handleReset}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-lg font-medium transition-colors"
-          >
-            Volver al formulario
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-16 bg-slate-50 min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-serif font-bold text-slate-900 mb-4">Agendá tu Consulta Virtual</h1>
-          <p className="text-lg text-slate-600">
-            Completá el formulario y elegí cómo querés enviarnos la consulta.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col md:flex-row">
-          {/* Info Side */}
-          <div className="md:w-1/3 bg-slate-900 text-white p-8">
-            <h3 className="text-xl font-bold mb-6">Información de Contacto</h3>
-            <div className="space-y-6">
-              <div className="flex items-start">
-                <MessageSquare className="h-6 w-6 text-amber-500 mr-3 mt-1" />
-                <div>
-                  <h4 className="font-medium">Teléfono / WhatsApp</h4>
-                  <a href="tel:+5492216180192" className="text-slate-400 hover:text-amber-400 text-sm mt-1 block transition-colors">+54 9 221 618-0192</a>
-                  <p className="text-xs text-slate-500 mt-1">Lunes a Viernes 9 a 18hs</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <Mail className="h-6 w-6 text-amber-500 mr-3 mt-1" />
-                <div>
-                  <h4 className="font-medium">Email</h4>
-                  <a href="mailto:lopezf.pl@gmail.com" className="text-slate-400 hover:text-amber-400 text-sm mt-1 block transition-colors">lopezf.pl@gmail.com</a>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <Users className="h-6 w-6 text-amber-500 mr-3 mt-1" />
-                <div>
-                  <h4 className="font-medium">Ubicación</h4>
-                  <p className="text-slate-400 text-sm mt-1">Punta Lara, Ensenada<br />Pcia. de Buenos Aires</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Side */}
-          <div className="md:w-2/3 p-8">
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Nombre y Apellido</label>
-                  <input
-                    type="text"
-                    value={formData.nombre}
-                    onChange={handleChange("nombre")}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow"
-                    placeholder="Juan Pérez"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono / WhatsApp</label>
-                  <input
-                    type="tel"
-                    value={formData.telefono}
-                    onChange={handleChange("telefono")}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow"
-                    placeholder="+54 11 ..."
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange("email")}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow"
-                  placeholder="tu@email.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Área de Interés</label>
-                <select
-                  value={formData.area}
-                  onChange={handleChange("area")}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow bg-white"
-                >
-                  <option value="">Selecciona un área...</option>
-                  <option>Jubilaciones y Pensiones</option>
-                  <option>Sucesiones</option>
-                  <option>Derecho Civil y Familia</option>
-                  <option>Concursos y Quiebras</option>
-                  <option>Consultoría Empresarial / Gestión de Crisis</option>
-                  <option>Otro / No estoy seguro</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Breve descripción de tu caso</label>
-                <textarea
-                  rows="4"
-                  value={formData.descripcion}
-                  onChange={handleChange("descripcion")}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow resize-none"
-                  placeholder="Describí brevemente tu situación para que el especialista adecuado analice tu caso..."
-                ></textarea>
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg">
-                  {error}
-                </div>
-              )}
-
-              {/* Botón principal: envío automático */}
-              <button
-                onClick={handleAutoSubmit}
-                disabled={isSending}
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 disabled:cursor-not-allowed text-white font-medium py-4 rounded-lg transition-colors shadow-md flex justify-center items-center text-lg"
-              >
-                {isSending ? (
-                  <>
-                    <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                    Enviando consulta...
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-5 w-5 mr-2" />
-                    Enviar consulta
-                  </>
-                )}
-              </button>
-
-              {/* Separador con alternativas */}
-              <div className="flex items-center gap-3 my-2">
-                <div className="flex-1 h-px bg-slate-200"></div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider">o también</span>
-                <div className="flex-1 h-px bg-slate-200"></div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={handleWhatsApp}
-                  disabled={isSending}
-                  className="flex-1 bg-white hover:bg-green-50 border-2 border-green-600 text-green-700 font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center disabled:opacity-50"
-                >
-                  <MessageCircle className="h-5 w-5 mr-2" /> WhatsApp
-                </button>
-                <button
-                  onClick={handleEmail}
-                  disabled={isSending}
-                  className="flex-1 bg-white hover:bg-slate-50 border-2 border-slate-700 text-slate-700 font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center disabled:opacity-50"
-                >
-                  <Mail className="h-5 w-5 mr-2" /> Email
-                </button>
-              </div>
-
-              <p className="text-xs text-center text-slate-500 mt-2">
-                Tus datos están protegidos por el secreto profesional y nuestra política de privacidad.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
