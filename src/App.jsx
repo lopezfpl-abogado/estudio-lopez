@@ -3944,6 +3944,22 @@ const HomeView = ({ navigateTo }) => (
           </div>
         </div>
       </div>
+      {/* Franja Agenda 2027 */}
+      <div className="relative z-10 border-t border-slate-700/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <p className="text-sm text-slate-200">
+            <span className="text-amber-500 font-semibold tracking-wider">AGENDA 2027</span>
+            <span className="text-slate-500 mx-2">·</span>
+            Tomo un número reducido de casos nuevos. Atención personal, sin respuestas automáticas.
+          </p>
+          <button
+            onClick={() => navigateTo('entrevista')}
+            className="text-sm text-amber-400 hover:text-amber-300 font-medium whitespace-nowrap self-start sm:self-auto"
+          >
+            Ver cómo trabajo →
+          </button>
+        </div>
+      </div>
     </section>
 
     {/* Profile Section */}
@@ -4067,6 +4083,39 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
           <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto">
             Me formé con el expediente en papel y hoy trabajo con las herramientas de esta época. Las uso para trabajar en tu caso, no para atenderte: la relación con vos es siempre directa.
           </p>
+        </div>
+      </section>
+
+      {/* Agenda 2027 */}
+      <section className="py-16 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 md:p-10">
+            <p className="text-xs font-bold tracking-wider text-amber-700 uppercase mb-2">Agenda 2027</p>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-6">
+              Incorporación de nuevos clientes
+            </h2>
+            <div className="space-y-4 text-slate-600 leading-relaxed">
+              <p>Durante 2027 voy a tomar un número reducido de casos nuevos.</p>
+              <p>
+                El motivo es simple: trabajo solo, sin intermediarios, y cada caso lo llevo personalmente. Para sostener ese trato no puedo tomar más de los que puedo atender bien.
+              </p>
+              <p className="text-slate-800 font-medium border-l-2 border-amber-500 pl-4">
+                Tu consulta la leo y la respondo yo. Ningún sistema automático ni inteligencia artificial contesta consultas ni da asesoramiento en mi nombre.
+              </p>
+              <p>
+                Si querés que analice tu caso, escribime por WhatsApp con una breve descripción. Te respondo personalmente y, si puedo tomarlo, coordinamos una reunión por Meet. Si no puedo o el caso me excede, te lo digo con franqueza.
+              </p>
+            </div>
+            <a
+              href={buildWhatsAppUrl("Hola Dr. López, quería consultarle por un caso. Brevemente: ")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-md transition-colors inline-flex items-center justify-center shadow-sm"
+            >
+              <WhatsAppIcon className="h-5 w-5 mr-2" />
+              Escribime por WhatsApp
+            </a>
+          </div>
         </div>
       </section>
 
