@@ -4089,17 +4089,17 @@ const EntrevistaEvaluacionView = ({ navigateTo }) => {
       {/* Agenda 2027 */}
       <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 md:p-10">
-            <p className="text-xs font-bold tracking-wider text-amber-700 uppercase mb-2">Agenda 2027</p>
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-6">
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 md:p-10 shadow-xl">
+            <p className="text-xs font-bold tracking-wider text-amber-500 uppercase mb-2">Agenda 2027</p>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mb-6">
               Incorporación de nuevos clientes
             </h2>
-            <div className="space-y-4 text-slate-600 leading-relaxed">
+            <div className="space-y-4 text-slate-300 leading-relaxed">
               <p>Durante 2027 voy a tomar un número reducido de casos nuevos.</p>
               <p>
                 El motivo es simple: trabajo solo, sin intermediarios, y cada caso lo llevo personalmente. Para sostener ese trato no puedo tomar más de los que puedo atender bien.
               </p>
-              <p className="text-slate-800 font-medium border-l-2 border-amber-500 pl-4">
+              <p className="text-white font-medium border-l-2 border-amber-500 pl-4">
                 Tu consulta la leo y la respondo yo. Ningún sistema automático ni inteligencia artificial contesta consultas ni da asesoramiento en mi nombre.
               </p>
               <p>
